@@ -21,14 +21,9 @@
 // Include the library headers.
 // 
 
-#include "LogLevel.hpp"
-#include "LogProvider.hpp"
-#include "LoggerConfig.hpp"
-#include "Logger.hpp"
-
-// 
-// Include the default logging providers.
-// 
-
-#include "Providers/DbgPrintProvider.hpp"
-#include "Providers/TempFileProvider.hpp"
+#include "Extensions/PointerExtensions.hpp"
+#include "Extensions/StringExtensions.hpp"
+#include "Extensions/VersionExtensions.hpp"
+#include "Extensions/TimeExtensions.hpp"
+#include "Extensions/ThreadExtensions.hpp"
+#include "Extensions/ArrayExtensions.hpp"

@@ -13,10 +13,54 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Extensions">
+      <UniqueIdentifier>{bb59e021-8392-4dd2-b0e8-d29d85472933}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Extensions">
+      <UniqueIdentifier>{10b6e31e-2dc5-4e85-aa1d-c5cd11b6dd50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Headers\EasyNT.hpp">
+    <ClInclude Include="Headers\EasyNT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\Extensions\StringExtensions.hpp">
+      <Filter>Header Files\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Extensions\PointerExtensions.hpp">
+      <Filter>Header Files\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Extensions\VersionExtensions.hpp">
+      <Filter>Header Files\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Extensions\TimeExtensions.hpp">
+      <Filter>Header Files\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Extensions\ThreadExtensions.hpp">
+      <Filter>Header Files\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Extensions\ArrayExtensions.hpp">
+      <Filter>Header Files\Extensions</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sources\EasyNT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Extensions\StringExtensions.cpp">
+      <Filter>Source Files\Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Extensions\VersionExtensions.cpp">
+      <Filter>Source Files\Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Extensions\TimeExtensions.cpp">
+      <Filter>Source Files\Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Extensions\ThreadExtensions.cpp">
+      <Filter>Source Files\Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Extensions\ArrayExtensions.cpp">
+      <Filter>Source Files\Extensions</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
