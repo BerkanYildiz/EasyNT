@@ -18,11 +18,11 @@ void RtlArrayForEach(TEntry* InArray, SIZE_T InNumberOfElements, void(*InCallbac
 
 	for (SIZE_T I = 0; I < InNumberOfElements; I++)
 		InCallback(InArray[I]);
+}
 
 /// <summary>
 /// Enumerates an array and execute a callback on each entries.
 /// </summary>
-}
 /// <typeparam name="TEntry">The type of the entries in the array.</typeparam>
 /// <typeparam name="TContext">The type of the context.</typeparam>
 /// <param name="InArray">The array.</param>
