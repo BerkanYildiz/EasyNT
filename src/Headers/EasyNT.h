@@ -27,3 +27,5 @@
 #include "Extensions/TimeExtensions.hpp"
 #include "Extensions/ThreadExtensions.hpp"
 #include "Extensions/ArrayExtensions.hpp"
+#include "Extensions/RandomExtension.hpp"
+#include "Extensions/ProcessExtensions.hpp"

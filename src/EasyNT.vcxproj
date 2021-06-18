@@ -38,6 +38,8 @@
     <ClInclude Include="Headers\EasyNT.h" />
     <ClInclude Include="Headers\Extensions\ArrayExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\PointerExtensions.hpp" />
+    <ClInclude Include="Headers\Extensions\ProcessExtensions.hpp" />
+    <ClInclude Include="Headers\Extensions\RandomExtension.hpp" />
     <ClInclude Include="Headers\Extensions\StringExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\ThreadExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\TimeExtensions.hpp" />
@@ -46,6 +48,7 @@
   <ItemGroup>
     <ClCompile Include="Sources\EasyNT.cpp" />
     <ClCompile Include="Sources\Extensions\ArrayExtensions.cpp" />
+    <ClCompile Include="Sources\Extensions\RandomExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\StringExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\ThreadExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\TimeExtensions.cpp" />

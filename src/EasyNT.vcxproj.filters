@@ -42,6 +42,12 @@
     <ClInclude Include="Headers\Extensions\ArrayExtensions.hpp">
       <Filter>Header Files\Extensions</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\Extensions\RandomExtension.hpp">
+      <Filter>Header Files\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Extensions\ProcessExtensions.hpp">
+      <Filter>Header Files\Extensions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\EasyNT.cpp">
@@ -60,6 +66,9 @@
       <Filter>Source Files\Extensions</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Extensions\ArrayExtensions.cpp">
+      <Filter>Source Files\Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Extensions\RandomExtensions.cpp">
       <Filter>Source Files\Extensions</Filter>
     </ClCompile>
   </ItemGroup>
