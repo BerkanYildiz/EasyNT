@@ -1,25 +1,5 @@
 #pragma once
 
-typedef struct _RTL_PROCESS_MODULE_INFORMATION
-{
-    HANDLE Section;
-    PVOID MappedBase;
-    PVOID ImageBase;
-    ULONG ImageSize;
-    ULONG Flags;
-    USHORT LoadOrderIndex;
-    USHORT InitOrderIndex;
-    USHORT LoadCount;
-    USHORT OffsetToFileName;
-    UCHAR FullPathName[256];
-} RTL_PROCESS_MODULE_INFORMATION, *PRTL_PROCESS_MODULE_INFORMATION;
-
-typedef struct _RTL_PROCESS_MODULES
-{
-    ULONG NumberOfModules;
-    RTL_PROCESS_MODULE_INFORMATION Modules[1];
-} RTL_PROCESS_MODULES, *PRTL_PROCESS_MODULES;
-
 typedef struct _LDR_DATA_TABLE_ENTRY {
 	LIST_ENTRY InLoadOrderLinks;
 	LIST_ENTRY InMemoryOrderLinks;
@@ -52,27 +32,6 @@ typedef struct _LDR_DATA_TABLE_ENTRY {
 	PVOID PatchInformation;
 
 } LDR_DATA_TABLE_ENTRY, *PLDR_DATA_TABLE_ENTRY;
-
-typedef struct _PEB_LDR_DATA
-{
-    ULONG Length;
-    BOOLEAN Initialized;
-    HANDLE SsHandle;
-    LIST_ENTRY InLoadOrderModuleList;
-    LIST_ENTRY InMemoryOrderModuleList;
-    LIST_ENTRY InInitializationOrderModuleList;
-    PVOID EntryInProgress;
-    BOOLEAN ShutdownInProgress;
-    HANDLE ShutdownThreadId;
-} PEB_LDR_DATA, *PPEB_LDR_DATA;
-
-typedef struct _PEB64 {
-	CHAR Reserved[0x10];
-	PVOID ImageBaseAddress;
-	PPEB_LDR_DATA Ldr;
-} PEB64, *PPEB64;
-
-typedef PEB64 PEB;
 
 EXTERN_C NTKERNELAPI ERESOURCE PsLoadedModuleResource;
 EXTERN_C NTKERNELAPI LIST_ENTRY PsLoadedModuleList;

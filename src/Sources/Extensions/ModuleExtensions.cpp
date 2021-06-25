@@ -128,7 +128,7 @@ NTSTATUS PsGetProcessModules(CONST PEPROCESS InProcess, OUT RTL_PROCESS_MODULE_I
 	// Retrieve the process environment block.
 	// 
 
-	PEB64* Peb = (PEB64*) PsGetProcessPeb(InProcess);
+	PEB* Peb = (PEB*) PsGetProcessPeb(InProcess);
 
 	if (Peb == nullptr)
 		return STATUS_PROCESS_IS_PROTECTED;

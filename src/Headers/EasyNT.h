@@ -10,6 +10,15 @@
 #include <wdm.h>
 
 // 
+// Include the process hacker headers.
+// 
+
+#define PHNT_VERSION 102
+#define PHNT_MODE 0
+
+#include "../../libraries/phnt/phnt.h"
+
+// 
 // Define the library globals.
 // 
 
