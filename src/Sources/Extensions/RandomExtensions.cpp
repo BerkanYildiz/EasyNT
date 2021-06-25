@@ -51,7 +51,7 @@ UINT32 RtlRandomInteger(UINT32 MaxValueExcluded)
 /// </summary>
 UINT32 RtlRandomInteger()
 {
-	RtlRandomInteger(0xFFFFFFFF);
+	return RtlRandomInteger(0xFFFFFFFF);
 }
 
 /// <summary>

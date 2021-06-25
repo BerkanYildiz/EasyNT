@@ -22,6 +22,7 @@
 // 
 
 #include "Extensions/PointerExtensions.hpp"
+#include "Extensions/MemoryExtensions.hpp"
 #include "Extensions/StringExtensions.hpp"
 #include "Extensions/VersionExtensions.hpp"
 #include "Extensions/TimeExtensions.hpp"
@@ -29,3 +30,4 @@
 #include "Extensions/ArrayExtensions.hpp"
 #include "Extensions/RandomExtension.hpp"
 #include "Extensions/ProcessExtensions.hpp"
+#include "Extensions/ModuleExtensions.hpp"
