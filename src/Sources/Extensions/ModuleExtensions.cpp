@@ -403,3 +403,170 @@ NTSTATUS PsGetProcessModuleInformationByAddress(CONST PEPROCESS InProcess, CONST
 	CkFreePool(Modules);
 	return HasFoundModule ? STATUS_SUCCESS : STATUS_NOT_FOUND;
 }
+
+/// <summary>
+/// Verifies and returns the DOS header of the module at the given address.
+/// </summary>
+/// <param name="InBaseAddress">The base address.</param>
+PIMAGE_DOS_HEADER RtlModuleDosHeader(CONST PVOID InBaseAddress)
+{
+	// 
+	// Verify the passed parameters.
+	// 
+	
+	if (InBaseAddress == nullptr)
+		return nullptr;
+
+	// 
+	// Verify if the DOS header is valid.
+	// 
+	
+	auto* DosHeader = (PIMAGE_DOS_HEADER) InBaseAddress;
+
+	if (DosHeader->e_magic != IMAGE_DOS_SIGNATURE)
+		return nullptr;
+
+	return DosHeader;
+}
+
+/// <summary>
+/// Verifies and returns the NT headers of the module at the given address.
+/// </summary>
+/// <param name="InBaseAddress">The base address.</param>
+PIMAGE_NT_HEADERS RtlModuleNtHeaders(CONST PVOID InBaseAddress)
+{
+	// 
+	// Verify the passed parameters.
+	// 
+
+	if (InBaseAddress == nullptr)
+		return nullptr;
+
+	// 
+	// Retrieve the DOS header.
+	// 
+
+	auto* const DosHeader = RtlModuleDosHeader(InBaseAddress);
+
+	if (DosHeader == nullptr)
+		return nullptr;
+	
+	// 
+	// Verify if the NT headers is valid.
+	// 
+
+	auto* NtHeaders = (PIMAGE_NT_HEADERS) RtlAddOffsetToPointer(InBaseAddress, DosHeader->e_lfanew);
+
+	if (DosHeader->e_lfanew == 0 || NtHeaders->Signature != IMAGE_NT_SIGNATURE)
+		return nullptr;
+
+	return NtHeaders;
+}
+
+/// <summary>
+/// Verifies and returns a pointer to the first section header of the module at the given address.
+/// </summary>
+/// <param name="InBaseAddress">The base address.</param>
+/// <param name="OutNumberOfSections">The number of sections.</param>
+PIMAGE_SECTION_HEADER RtlModuleSectionHeaders(CONST PVOID InBaseAddress, OPTIONAL OUT ULONG* OutNumberOfSections)
+{
+	// 
+	// Verify the passed parameters.
+	// 
+
+	if (InBaseAddress == nullptr)
+		return nullptr;
+
+	// 
+	// Retrieve the DOS header.
+	// 
+
+	auto* const DosHeader = RtlModuleDosHeader(InBaseAddress);
+
+	if (DosHeader == nullptr)
+		return nullptr;
+
+	// 
+	// Retrieve the NT headers.
+	// 
+
+	auto* const NtHeaders = RtlModuleNtHeaders(InBaseAddress);
+
+	if (NtHeaders == nullptr)
+		return nullptr;
+
+	if (OutNumberOfSections != nullptr)
+		*OutNumberOfSections = NtHeaders->FileHeader.NumberOfSections;
+
+#if _WIN64
+	return (PIMAGE_SECTION_HEADER) RtlAddOffsetToPointer(NtHeaders, sizeof(IMAGE_NT_HEADERS64));
+#else
+	return (PIMAGE_SECTION_HEADER) RtlAddOffsetToPointer(NtHeaders, sizeof(IMAGE_NT_HEADERS32));
+#endif
+}
+
+/// <summary>
+/// Enumerates the sections headers of the module present at the given address.
+/// </summary>
+/// <param name="InBaseAddress">The base address.</param>
+/// <param name="InContext">The context.</param>
+/// <param name="InCallback">The callback.</param>
+NTSTATUS RtlEnumerateModuleSections(CONST PVOID InBaseAddress, PVOID InContext, ENUMERATE_MODULE_SECTIONS_WITH_CONTEXT InCallback)
+{
+	// 
+	// Verify the passed parameters.
+	// 
+
+	if (InBaseAddress == nullptr)
+		return STATUS_INVALID_PARAMETER_1;
+
+	if (InContext == nullptr)
+		return STATUS_INVALID_PARAMETER_2;
+
+	if (InCallback == nullptr)
+		return STATUS_INVALID_PARAMETER_3;
+
+	// 
+	// Retrieve the NT headers.
+	// 
+
+	auto* const NtHeaders = RtlModuleNtHeaders(InBaseAddress);
+
+	if (NtHeaders == nullptr)
+		return STATUS_INVALID_IMAGE_FORMAT;
+	
+	// 
+	// Retrieve the section headers.
+	// 
+
+	auto* const SectionHeaders = RtlModuleSectionHeaders(InBaseAddress);
+
+	if (SectionHeaders == nullptr)
+		return STATUS_INVALID_IMAGE_FORMAT;
+
+	// 
+	// Enumerates every section headers.
+	// 
+
+	for (WORD I = 0; I < NtHeaders->FileHeader.NumberOfSections; I++)
+	{
+		if (InCallback(I, &SectionHeaders[I], InContext))
+			break;
+	}
+	
+	return STATUS_SUCCESS;
+}
+
+/// <summary>
+/// Enumerates the sections headers of the module present at the given address.
+/// </summary>
+/// <param name="InBaseAddress">The base address.</param>
+/// <param name="InCallback">The callback.</param>
+NTSTATUS RtlEnumerateModuleSections(CONST PVOID InBaseAddress, ENUMERATE_MODULE_SECTIONS InCallback)
+{
+	return RtlEnumerateModuleSections(InBaseAddress, InCallback, [] (ULONG InIndex, IMAGE_SECTION_HEADER* InSectionHeader, PVOID InContext) -> bool
+	{
+		auto* Callback = (ENUMERATE_MODULE_SECTIONS) InContext;
+		return Callback(InIndex, InSectionHeader);
+	});
+}

@@ -36,6 +36,9 @@ typedef struct _LDR_DATA_TABLE_ENTRY {
 EXTERN_C NTKERNELAPI ERESOURCE PsLoadedModuleResource;
 EXTERN_C NTKERNELAPI LIST_ENTRY PsLoadedModuleList;
 
+typedef bool(* ENUMERATE_MODULE_SECTIONS)(ULONG InIndex, IMAGE_SECTION_HEADER* InSectionHeader);
+typedef bool(* ENUMERATE_MODULE_SECTIONS_WITH_CONTEXT)(ULONG InIndex, IMAGE_SECTION_HEADER* InSectionHeader, VOID* InContext);
+
 /// <summary>
 /// Gets information about every modules loaded into the given process.
 /// </summary>
@@ -67,3 +70,37 @@ NTSTATUS PsGetProcessModuleInformation(CONST PEPROCESS InProcess, CONST WCHAR* I
 /// <param name="InModuleAddress">A virtual address pointing inside a module.</param>
 /// <param name="OutModuleInformation">The result.</param>
 NTSTATUS PsGetProcessModuleInformationByAddress(CONST PEPROCESS InProcess, CONST PVOID InModuleAddress, OUT OPTIONAL RTL_PROCESS_MODULE_INFORMATION* OutModuleInformation = nullptr);
+
+/// <summary>
+/// Verifies and returns the DOS header of the module at the given address.
+/// </summary>
+/// <param name="InBaseAddress">The base address.</param>
+PIMAGE_DOS_HEADER RtlModuleDosHeader(CONST PVOID InBaseAddress);
+
+/// <summary>
+/// Verifies and returns the NT headers of the module at the given address.
+/// </summary>
+/// <param name="InBaseAddress">The base address.</param>
+PIMAGE_NT_HEADERS RtlModuleNtHeaders(CONST PVOID InBaseAddress);
+
+/// <summary>
+/// Verifies and returns a pointer to the first section header of the module at the given address.
+/// </summary>
+/// <param name="InBaseAddress">The base address.</param>
+/// <param name="OutNumberOfSections">The number of sections.</param>
+PIMAGE_SECTION_HEADER RtlModuleSectionHeaders(CONST PVOID InBaseAddress, OPTIONAL OUT ULONG* OutNumberOfSections = nullptr);
+
+/// <summary>
+/// Enumerates the sections headers of the module present at the given address.
+/// </summary>
+/// <param name="InBaseAddress">The base address.</param>
+/// <param name="InContext">The context.</param>
+/// <param name="InCallback">The callback.</param>
+NTSTATUS RtlEnumerateModuleSections(CONST PVOID InBaseAddress, PVOID InContext, ENUMERATE_MODULE_SECTIONS_WITH_CONTEXT InCallback);
+
+/// <summary>
+/// Enumerates the sections headers of the module present at the given address.
+/// </summary>
+/// <param name="InBaseAddress">The base address.</param>
+/// <param name="InCallback">The callback.</param>
+NTSTATUS RtlEnumerateModuleSections(CONST PVOID InBaseAddress, ENUMERATE_MODULE_SECTIONS_WITH_CONTEXT InCallback);

@@ -6,7 +6,7 @@
 /// <param name="InBaseAddress">The base address.</param>
 /// <param name="InSize">The size of the region in bytes.</param>
 /// <param name="InSignature">The signature.</param>
-/// <param name="OutResult">The signature scan result.</param>
+/// <param name="OutResult">The result.</param>
 BOOLEAN CkTryFindPattern(CONST PVOID InBaseAddress, SIZE_T InSize, CONST CHAR* InSignature, OPTIONAL OUT PVOID* OutResult)
 {
 	// 
@@ -14,13 +14,13 @@ BOOLEAN CkTryFindPattern(CONST PVOID InBaseAddress, SIZE_T InSize, CONST CHAR* I
 	// 
 
 	if (InBaseAddress == nullptr)
-		return false;
+		return FALSE;
 
 	if (InSize == 0)
-		return false;
+		return FALSE;
 
 	if (InSignature == nullptr)
-		return false;
+		return FALSE;
 
 	// 
 	// Setup the scan structures.
@@ -42,15 +42,10 @@ BOOLEAN CkTryFindPattern(CONST PVOID InBaseAddress, SIZE_T InSize, CONST CHAR* I
 	SIZE_T SignatureLength = 0;
 	SIZE_T SignatureStep = 0;
 	
-	while (TRUE)
+	while (InSignature[SignatureStep])
 	{
 		switch (InSignature[SignatureStep])
 		{
-			case NULL:
-			{
-				goto LoopBreak;
-			}
-
 			case ' ':
 			case '-':
 			{
@@ -62,7 +57,7 @@ BOOLEAN CkTryFindPattern(CONST PVOID InBaseAddress, SIZE_T InSize, CONST CHAR* I
 			{
 				auto* Entry = &SignatureBytes[SignatureLength++];
 				Entry->Value = 0x00;
-				Entry->IsWildcard = true;
+				Entry->IsWildcard = TRUE;
 
 				if (InSignature[SignatureStep + 1] == '?')
 					SignatureStep += sizeof(char) * 2;
@@ -75,8 +70,8 @@ BOOLEAN CkTryFindPattern(CONST PVOID InBaseAddress, SIZE_T InSize, CONST CHAR* I
 			default:
 			{
 				auto* Entry = &SignatureBytes[SignatureLength++];
-				Entry->Value = Entry->Value = RtlHexadecimalStringToByte(&InSignature[SignatureStep]);
-				Entry->IsWildcard = false;
+				Entry->Value = RtlHexadecimalStringToByte(&InSignature[SignatureStep]);
+				Entry->IsWildcard = FALSE;
 
 				SignatureStep += sizeof(char) * 2;
 				break;
@@ -85,50 +80,267 @@ BOOLEAN CkTryFindPattern(CONST PVOID InBaseAddress, SIZE_T InSize, CONST CHAR* I
 	}
 
 	// 
-	// The signature can't be bigger than the region of memory we are about to scan.
+	// The signature cannot be bigger than the region of memory we are about to scan.
 	// 
-
-LoopBreak:
 	
 	if (InSize < SignatureLength)
-		return false;
+		return FALSE;
 
 	// 
-	// Begin to scan the given memory range.
+	// Loop through the memory region.
 	// 
 
-	for (SIZE_T I = 0; I < InSize - SignatureLength; I++)
+	for (SIZE_T X = 0; X < InSize - SignatureLength; X++)
 	{
-		BOOLEAN HasBeenFound = true;
+		// 
+		// Search for the pattern.
+		// 
 
-		for (SIZE_T X = 0; X < SignatureLength; X++)
+		for (SIZE_T Y = 0; Y < SignatureLength; Y++)
 		{
-			auto* const Entry = &SignatureBytes[X];
+			auto* const Entry = &SignatureBytes[Y];
 
-			if (Entry->IsWildcard)
-				continue;
+			// 
+			// Check if the bytes matches.
+			//
+			
+			if (Entry->IsWildcard == FALSE)
+			{
+				auto const Value = *(UINT8*) RtlAddOffsetToPointer(InBaseAddress, X + Y);
 
-			auto const Value = *(UINT8*) RtlAddOffsetToPointer(InBaseAddress, I + X);
+				if (Value != Entry->Value)
+					break;
+			}
 
-			if (Value == Entry->Value)
-				continue;
+			// 
+			// If this was the last byte for the scan...
+			// 
+			
+			if (Y == SignatureLength - 1)
+			{
+				if (OutResult != nullptr)
+					*OutResult = RtlAddOffsetToPointer(InBaseAddress, X);
 
-			HasBeenFound = false;
+				return TRUE;
+			}
+
 			break;
-		}
-
-		// 
-		// We've found the signature, let's break both loops.
-		// 
-
-		if (HasBeenFound)
-		{
-			if (OutResult != nullptr)
-				*OutResult = RtlAddOffsetToPointer(InBaseAddress, I);
-
-			return TRUE;
 		}
 	}
 
 	return FALSE;
+}
+
+/// <summary>
+/// Searches for a successive pattern of a specific padding byte in the given memory range.
+/// </summary>
+/// <param name="InBaseAddress">The base address.</param>
+/// <param name="InSize">The size of the region in bytes.</param>
+/// <param name="InPaddingByte">The padding byte.</param>
+/// <param name="InPaddingLength">The padding length.</param>
+/// <param name="OutResult">The result.</param>
+BOOLEAN CkTryFindPadding(CONST PVOID InBaseAddress, SIZE_T InSize, UINT8 InPaddingByte, SIZE_T InPaddingLength, OPTIONAL OUT PVOID* OutResult)
+{
+	// 
+	// Verify the passed parameters.
+	// 
+
+	if (InBaseAddress == nullptr)
+		return FALSE;
+
+	if (InSize == 0)
+		return FALSE;
+
+	if (InPaddingLength == 0)
+		return FALSE;
+
+	// 
+	// Loop through the memory region.
+	// 
+	
+	for (SIZE_T X = 0; X < InSize - InPaddingLength; X++)
+	{
+		// 
+		// Search for the padding.
+		// 
+
+		for (SIZE_T Y = 0; Y < InPaddingLength; Y++)
+		{
+			// 
+			// Check if the bytes matches.
+			// 
+
+			const auto CurrentByte = *(UINT8*) RtlAddOffsetToPointer(InBaseAddress, X + Y);
+
+			if (CurrentByte != InPaddingByte)
+				break;
+
+			// 
+			// If this was the last byte for the scan...
+			// 
+			
+			if (Y == InPaddingLength - 1)
+			{
+				if (OutResult != nullptr)
+					*OutResult = RtlAddOffsetToPointer(InBaseAddress, X);
+
+				return TRUE;
+			}
+		}
+	}
+
+	return FALSE;
+}
+
+/// <summary>
+/// Searches for a successive pattern of a specific padding byte in the given memory range, starting from the end.
+/// </summary>
+/// <param name="InBaseAddress">The base address.</param>
+/// <param name="InSize">The size of the region in bytes.</param>
+/// <param name="InPaddingByte">The padding byte.</param>
+/// <param name="InPaddingLength">The padding length.</param>
+/// <param name="OutResult">The result.</param>
+BOOLEAN CkTryFindPaddingFromEnd(CONST PVOID InBaseAddress, SIZE_T InSize, UINT8 InPaddingByte, SIZE_T InPaddingLength, OPTIONAL OUT PVOID* OutResult)
+{
+	// 
+	// Verify the passed parameters.
+	// 
+
+	if (InBaseAddress == nullptr)
+		return FALSE;
+
+	if (InSize == 0)
+		return FALSE;
+
+	if (InPaddingLength == 0)
+		return FALSE;
+
+	// 
+	// Loop through the memory region.
+	// 
+	
+	for (SIZE_T X = InSize - InPaddingLength; X > 0 ; X--)
+	{
+		// 
+		// Search for the padding.
+		// 
+
+		for (SIZE_T Y = 0; Y < InPaddingLength; Y++)
+		{
+			// 
+			// Check if the bytes matches.
+			// 
+
+			const auto CurrentByte = *(UINT8*) RtlAddOffsetToPointer(InBaseAddress, X + Y);
+
+			if (CurrentByte != InPaddingByte)
+				break;
+
+			// 
+			// If this was the last byte for the scan...
+			// 
+			
+			if (Y == InPaddingLength - 1)
+			{
+				if (OutResult != nullptr)
+					*OutResult = RtlAddOffsetToPointer(InBaseAddress, X);
+
+				return TRUE;
+			}
+		}
+	}
+
+	return FALSE;
+}
+
+/// <summary>
+/// Searches for a certain pattern inside the given module's executable sections.
+/// </summary>
+/// <param name="InBaseAddress">The base address.</param>
+/// <param name="InSignature">The signature.</param>
+/// <param name="OutResult">The signature scan result.</param>
+BOOLEAN CkTryFindPatternInModuleExecutableSections(CONST PVOID InBaseAddress, CONST CHAR* InSignature, OPTIONAL OUT PVOID* OutResult)
+{
+	// 
+	// Verify the passed parameters.
+	// 
+
+	if (InBaseAddress == nullptr)
+		return FALSE;
+
+	if (InSignature == nullptr)
+		return FALSE;
+
+	// 
+	// Setup the scan context.
+	// 
+
+	struct SCAN_CONTEXT
+	{
+		PVOID BaseAddress;
+		CONST CHAR* Signature;
+		PVOID Result;
+	};
+
+	SCAN_CONTEXT ScanContext;
+	ScanContext.BaseAddress = InBaseAddress;
+	ScanContext.Signature = InSignature;
+	ScanContext.Result = NULL;
+
+	// 
+	// Enumerate the sections of the module.
+	// 
+
+	RtlEnumerateModuleSections(InBaseAddress, &ScanContext, [] (ULONG InIndex, IMAGE_SECTION_HEADER* SectionHeader, PVOID InContext) -> bool
+	{
+		auto* ScanContext = (SCAN_CONTEXT*) InContext;
+
+		// 
+		// Parse the section's characteristics.
+		// 
+
+		auto Executable	 = (SectionHeader->Characteristics & IMAGE_SCN_MEM_EXECUTE) != 0;
+		auto Readable	 = (SectionHeader->Characteristics & IMAGE_SCN_MEM_READ) != 0;
+		auto Writable	 = (SectionHeader->Characteristics & IMAGE_SCN_MEM_WRITE) != 0;
+		auto Discardable = (SectionHeader->Characteristics & IMAGE_SCN_MEM_DISCARDABLE) != 0;
+		auto ContainCode = (SectionHeader->Characteristics & IMAGE_SCN_CNT_CODE) != 0;
+
+		// 
+		// Discardable sections are not mapped.
+		// 
+
+		if (Discardable)
+			return FALSE;
+
+		// 
+		// Check if the section is executable or contains code.
+		// 
+
+		if (!Executable && !ContainCode)
+			return FALSE;
+
+		// 
+		// Verify the validity of the address.
+		// 
+
+		auto* SectionData = RtlAddOffsetToPointer(ScanContext->BaseAddress, SectionHeader->VirtualAddress);
+
+		if (!MmIsAddressValid(SectionData))
+			return FALSE;
+
+		// 
+		// Scan this section.
+		// 
+
+		return CkTryFindPattern(SectionData, SectionHeader->Misc.VirtualSize, ScanContext->Signature, &ScanContext->Result);
+	});
+
+	// 
+	// Return the resulting address.
+	// 
+
+	if (OutResult != nullptr)
+		*OutResult = ScanContext.Result;
+
+	return ScanContext.Result != NULL;
 }
