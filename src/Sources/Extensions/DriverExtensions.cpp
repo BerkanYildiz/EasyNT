@@ -55,3 +55,70 @@ NTSTATUS IoGetDriverObject(CONST CHAR* InDriverName, PDRIVER_OBJECT* OutDriverOb
 	RtlFreeUnicodeString(&DriverName);
 	return Status;
 }
+
+/// <summary>
+/// Enumerates every devices owned by the given driver.
+/// </summary>
+/// <param name="InDriverObject">The driver object.</param>
+/// <param name="InContext">The context.</param>
+/// <param name="InCallback">The callback.</param>
+NTSTATUS IoEnumerateDevices(CONST DRIVER_OBJECT* InDriverObject, PVOID InContext, ENUMERATE_DRIVER_DEVICES_WITH_CONTEXT InCallback)
+{
+	// 
+	// Verify the passed parameters.
+	// 
+
+	if (InDriverObject == nullptr)
+		return STATUS_INVALID_PARAMETER_1;
+
+	if (InContext == nullptr)
+		return STATUS_INVALID_PARAMETER_2;
+
+	if (InCallback == nullptr)
+		return STATUS_INVALID_PARAMETER_3;
+
+	if (InDriverObject->DeviceObject == nullptr)
+		return STATUS_NO_MORE_ENTRIES;
+
+	// 
+	// Loop through the device objects owned by the driver.
+	// 
+
+	auto CurrentDeviceIndex = 0;
+	auto* CurrentDevice = InDriverObject->DeviceObject;
+
+	while (TRUE)
+	{
+		ObfReferenceObject(CurrentDevice);
+		const auto SkipOtherEntries = InCallback(CurrentDeviceIndex++, CurrentDevice, InContext);
+		ObfDereferenceObject(CurrentDevice);
+		
+		if (SkipOtherEntries)
+			break;
+
+		// 
+		// Move onto the next entry.
+		// 
+
+		CurrentDevice = CurrentDevice->NextDevice;
+
+		if (CurrentDevice == nullptr)
+			break;
+	}
+
+	return STATUS_SUCCESS;
+}
+
+/// <summary>
+/// Enumerates every devices owned by the given driver.
+/// </summary>
+/// <param name="InDriverObject">The driver object.</param>
+/// <param name="InCallback">The callback.</param>
+NTSTATUS IoEnumerateDevices(CONST DRIVER_OBJECT* InDriverObject, ENUMERATE_DRIVER_DEVICES InCallback)
+{
+	return IoEnumerateDevices(InDriverObject, InCallback, [] (ULONG InIndex, DEVICE_OBJECT* InDeviceObject, PVOID InContext) -> bool
+	{
+		auto* Callback = (ENUMERATE_DRIVER_DEVICES) InContext;
+		return Callback(InIndex, InDeviceObject);
+	});
+}

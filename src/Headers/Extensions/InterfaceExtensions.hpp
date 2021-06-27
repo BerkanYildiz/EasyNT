@@ -17,3 +17,18 @@ NTSTATUS IoEnumerateDevicesByInterface(GUID InInterfaceGuid, PVOID InContext, EN
 /// <param name="InInterfaceGuid">The interface GUID.</param>
 /// <param name="InCallback">The callback.</param>
 NTSTATUS IoEnumerateDevicesByInterface(GUID InInterfaceGuid, ENUMERATE_INTERFACE_DEVICES InCallback);
+
+/// <summary>
+/// Enumerates every device objects linked to the given interface GUID.
+/// </summary>
+/// <param name="InInterfaceGuid">The interface GUID.</param>
+/// <param name="InContext">The context.</param>
+/// <param name="InCallback">The callback.</param>
+NTSTATUS IoEnumerateDevicesByInterface(CONST WCHAR* InInterfaceGuid, PVOID InContext, ENUMERATE_INTERFACE_DEVICES_WITH_CONTEXT InCallback);
+
+/// <summary>
+/// Enumerates every device objects linked to the given interface GUID.
+/// </summary>
+/// <param name="InInterfaceGuid">The interface GUID.</param>
+/// <param name="InCallback">The callback.</param>
+NTSTATUS IoEnumerateDevicesByInterface(CONST WCHAR* InInterfaceGuid, ENUMERATE_INTERFACE_DEVICES InCallback);

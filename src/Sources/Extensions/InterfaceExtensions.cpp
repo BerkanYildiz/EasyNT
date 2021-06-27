@@ -62,24 +62,24 @@ NTSTATUS IoEnumerateDevicesByInterface(GUID InInterfaceGuid, PVOID InContext, EN
 		DEVICE_OBJECT* DeviceObject;
 		Status = IoGetDeviceObject(SymbolicList, GENERIC_ALL, &DeviceObject);
 
-		if (NT_ERROR(Status))
-			goto Skip;
+		if (NT_SUCCESS(Status))
+		{
+			// 
+			// Execute the callback on this device object.
+			// 
 
-		// 
-		// Execute the callback on this device object.
-		// 
+			const auto SkipOtherEntries = InCallback(DeviceObject, InContext);
 
-		const auto SkipOtherEntries = InCallback(DeviceObject, InContext);
+			ObfDereferenceObject(DeviceObject);
 
-		ObfDereferenceObject(DeviceObject);
+			if (SkipOtherEntries)
+				break;
+		}
 
-		if (SkipOtherEntries)
-			break;
-		
 		// 
 		// Move onto the next entry.
 		// 
-	Skip:
+
 		CurrentSymbolicLink = (WCHAR*) RtlAddOffsetToPointer(CurrentSymbolicLink, SymbolicName.Length);
 	}
 
@@ -103,4 +103,69 @@ NTSTATUS IoEnumerateDevicesByInterface(GUID InInterfaceGuid, ENUMERATE_INTERFACE
 		auto* Callback = (ENUMERATE_INTERFACE_DEVICES) InContext;
 		return Callback(InDeviceObject);
 	});
+}
+
+/// <summary>
+/// Enumerates every device objects linked to the given interface GUID.
+/// </summary>
+/// <param name="InInterfaceGuid">The interface GUID.</param>
+/// <param name="InContext">The context.</param>
+/// <param name="InCallback">The callback.</param>
+NTSTATUS IoEnumerateDevicesByInterface(CONST WCHAR* InInterfaceGuid, PVOID InContext, ENUMERATE_INTERFACE_DEVICES_WITH_CONTEXT InCallback)
+{
+	NTSTATUS Status;
+
+	// 
+	// Verify the passed parameters.
+	// 
+
+	if (InInterfaceGuid == NULL)
+		return STATUS_INVALID_PARAMETER_1;
+
+	// 
+	// Convert the interface GUID from a unicode string to an actual parsed GUID structure.
+	// 
+	
+	UNICODE_STRING InterfaceGuidToConvert;
+	RtlInitUnicodeString(&InterfaceGuidToConvert, InInterfaceGuid);
+	
+	GUID InterfaceGuid;
+	Status = RtlGUIDFromString(&InterfaceGuidToConvert, &InterfaceGuid);
+
+	if (NT_ERROR(Status))
+		return Status;
+
+	return IoEnumerateDevicesByInterface(InterfaceGuid, InContext, InCallback);
+}
+
+/// <summary>
+/// Enumerates every device objects linked to the given interface GUID.
+/// </summary>
+/// <param name="InInterfaceGuid">The interface GUID.</param>
+/// <param name="InCallback">The callback.</param>
+NTSTATUS IoEnumerateDevicesByInterface(CONST WCHAR* InInterfaceGuid, ENUMERATE_INTERFACE_DEVICES InCallback)
+{
+	NTSTATUS Status;
+
+	// 
+	// Verify the passed parameters.
+	// 
+
+	if (InInterfaceGuid == NULL)
+		return STATUS_INVALID_PARAMETER_1;
+
+	// 
+	// Convert the interface GUID from a unicode string to an actual parsed GUID structure.
+	// 
+	
+	UNICODE_STRING InterfaceGuidToConvert;
+	RtlInitUnicodeString(&InterfaceGuidToConvert, InInterfaceGuid);
+	
+	GUID InterfaceGuid;
+	Status = RtlGUIDFromString(&InterfaceGuidToConvert, &InterfaceGuid);
+
+	if (NT_ERROR(Status))
+		return Status;
+
+	return IoEnumerateDevicesByInterface(InterfaceGuid, InCallback);
 }
