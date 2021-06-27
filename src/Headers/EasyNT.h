@@ -56,3 +56,5 @@
 #include "Extensions/DriverExtensions.hpp"
 #include "Extensions/FileExtensions.hpp"
 #include "Extensions/InterfaceExtensions.hpp"
+#include "Extensions/ScanExtensions.hpp"
+#include "Extensions/ConversionExtensions.hpp"

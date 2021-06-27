@@ -38,6 +38,7 @@
     <ClInclude Include="Headers\EasyNT.h" />
     <ClInclude Include="Headers\EasyNTAPI.h" />
     <ClInclude Include="Headers\Extensions\ArrayExtensions.hpp" />
+    <ClInclude Include="Headers\Extensions\ConversionExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\DeviceExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\DriverExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\FileExtensions.hpp" />
@@ -47,6 +48,7 @@
     <ClInclude Include="Headers\Extensions\PointerExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\ProcessExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\RandomExtension.hpp" />
+    <ClInclude Include="Headers\Extensions\ScanExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\StringExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\ThreadExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\TimeExtensions.hpp" />
@@ -56,6 +58,7 @@
   <ItemGroup>
     <ClCompile Include="Sources\EasyNT.cpp" />
     <ClCompile Include="Sources\Extensions\ArrayExtensions.cpp" />
+    <ClCompile Include="Sources\Extensions\ConversionExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\DeviceExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\DriverExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\InterfaceExtensions.cpp" />
@@ -63,6 +66,7 @@
     <ClCompile Include="Sources\Extensions\ModuleExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\ProcessExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\RandomExtensions.cpp" />
+    <ClCompile Include="Sources\Extensions\ScanExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\StringExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\ThreadExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\TimeExtensions.cpp" />

@@ -78,6 +78,12 @@
     <ClInclude Include="Headers\EasyNTAPI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\Extensions\ScanExtensions.hpp">
+      <Filter>Header Files\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Extensions\ConversionExtensions.hpp">
+      <Filter>Header Files\Extensions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\EasyNT.cpp">
@@ -120,6 +126,12 @@
       <Filter>Source Files\Extensions</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Extensions\InterfaceExtensions.cpp">
+      <Filter>Source Files\Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Extensions\ScanExtensions.cpp">
+      <Filter>Source Files\Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Extensions\ConversionExtensions.cpp">
       <Filter>Source Files\Extensions</Filter>
     </ClCompile>
   </ItemGroup>
