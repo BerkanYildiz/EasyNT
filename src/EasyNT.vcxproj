@@ -36,7 +36,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\EasyNT.h" />
+    <ClInclude Include="Headers\EasyNTAPI.h" />
     <ClInclude Include="Headers\Extensions\ArrayExtensions.hpp" />
+    <ClInclude Include="Headers\Extensions\DeviceExtensions.hpp" />
+    <ClInclude Include="Headers\Extensions\DriverExtensions.hpp" />
+    <ClInclude Include="Headers\Extensions\FileExtensions.hpp" />
+    <ClInclude Include="Headers\Extensions\InterfaceExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\MemoryExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\ModuleExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\PointerExtensions.hpp" />
@@ -46,10 +51,14 @@
     <ClInclude Include="Headers\Extensions\ThreadExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\TimeExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\VersionExtensions.hpp" />
+    <ClInclude Include="Headers\Managers\MemoryManager.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\EasyNT.cpp" />
     <ClCompile Include="Sources\Extensions\ArrayExtensions.cpp" />
+    <ClCompile Include="Sources\Extensions\DeviceExtensions.cpp" />
+    <ClCompile Include="Sources\Extensions\DriverExtensions.cpp" />
+    <ClCompile Include="Sources\Extensions\InterfaceExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\MemoryExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\ModuleExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\ProcessExtensions.cpp" />
@@ -58,6 +67,7 @@
     <ClCompile Include="Sources\Extensions\ThreadExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\TimeExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\VersionExtensions.cpp" />
+    <ClCompile Include="Sources\Managers\MemoryManager.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{99289994-0B01-4966-BCB5-3203E1891BA1}</ProjectGuid>

@@ -19,6 +19,12 @@
     <Filter Include="Source Files\Extensions">
       <UniqueIdentifier>{10b6e31e-2dc5-4e85-aa1d-c5cd11b6dd50}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Managers">
+      <UniqueIdentifier>{0238236c-7dd9-4eab-af19-952c8bc138b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Managers">
+      <UniqueIdentifier>{4dec4515-f9f3-4d19-b4a8-0c20c1855538}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\EasyNT.h">
@@ -48,11 +54,29 @@
     <ClInclude Include="Headers\Extensions\ProcessExtensions.hpp">
       <Filter>Header Files\Extensions</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\Extensions\ModuleExtensions.hpp">
+      <Filter>Header Files\Extensions</Filter>
+    </ClInclude>
     <ClInclude Include="Headers\Extensions\MemoryExtensions.hpp">
       <Filter>Header Files\Extensions</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\Extensions\ModuleExtensions.hpp">
+    <ClInclude Include="Headers\Managers\MemoryManager.hpp">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Extensions\DeviceExtensions.hpp">
       <Filter>Header Files\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Extensions\DriverExtensions.hpp">
+      <Filter>Header Files\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Extensions\InterfaceExtensions.hpp">
+      <Filter>Header Files\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Extensions\FileExtensions.hpp">
+      <Filter>Header Files\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\EasyNTAPI.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -80,10 +104,22 @@
     <ClCompile Include="Sources\Extensions\ProcessExtensions.cpp">
       <Filter>Source Files\Extensions</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Extensions\ModuleExtensions.cpp">
+      <Filter>Source Files\Extensions</Filter>
+    </ClCompile>
     <ClCompile Include="Sources\Extensions\MemoryExtensions.cpp">
       <Filter>Source Files\Extensions</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Extensions\ModuleExtensions.cpp">
+    <ClCompile Include="Sources\Managers\MemoryManager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Extensions\DeviceExtensions.cpp">
+      <Filter>Source Files\Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Extensions\DriverExtensions.cpp">
+      <Filter>Source Files\Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Extensions\InterfaceExtensions.cpp">
       <Filter>Source Files\Extensions</Filter>
     </ClCompile>
   </ItemGroup>

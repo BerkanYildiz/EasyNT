@@ -19,12 +19,24 @@
 #include "../../libraries/phnt/phnt.h"
 
 // 
+// Include our custom NT API header.
+// 
+
+#include "EasyNTAPI.h"
+
+// 
 // Define the library globals.
 // 
 
 #define LOGGER_NT_VERSION_MAJOR 1
 #define LOGGER_NT_VERSION_MINOR 0
 #define LOGGER_NT_VERSION_BUILD 0
+
+// 
+// Include the memory manager.
+// 
+
+#include "Managers/MemoryManager.hpp"
 
 // 
 // Include the library headers.
@@ -40,3 +52,7 @@
 #include "Extensions/RandomExtension.hpp"
 #include "Extensions/ProcessExtensions.hpp"
 #include "Extensions/ModuleExtensions.hpp"
+#include "Extensions/DeviceExtensions.hpp"
+#include "Extensions/DriverExtensions.hpp"
+#include "Extensions/FileExtensions.hpp"
+#include "Extensions/InterfaceExtensions.hpp"

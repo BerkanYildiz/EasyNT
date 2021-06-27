@@ -1,49 +1,37 @@
 #include "../../Headers/EasyNT.h"
 
 /// <summary>
-/// Allocates memory from a specific pool with a tag.
+/// Maps physical memory and read its content.
 /// </summary>
-/// <param name="InPoolType">The type of pool.</param>
-/// <param name="InNumberOfBytes">The number of bytes.</param>
-/// <param name="InTag">The tag.</param>
-PVOID CkAllocatePoolWithTag(POOL_TYPE InPoolType, SIZE_T InNumberOfBytes, ULONG InTag)
+/// <param name="InPhysicalAddress">The physical address.</param>
+/// <param name="OutBuffer">The buffer.</param>
+/// <param name="InNumberOfBytes">The number of bytes to read.</param>
+NTSTATUS MmReadPhysicalMemory(LARGE_INTEGER InPhysicalAddress, PVOID OutBuffer, SIZE_T InNumberOfBytes)
 {
-	CONST PVOID Pool = ExAllocatePoolWithTag(InPoolType, InNumberOfBytes, InTag);
+	CONST PVOID VirtualAddress = MmMapIoSpace(InPhysicalAddress, PAGE_ROUND_UP(InNumberOfBytes), MmNonCached);
 
-	if (Pool != nullptr)
-		RtlSecureZeroMemory(Pool, InNumberOfBytes);
+	if (VirtualAddress == nullptr)
+		return STATUS_INTERNAL_ERROR;
 
-	return Pool;
+	RtlCopyMemory(OutBuffer, VirtualAddress, InNumberOfBytes);
+	MmUnmapIoSpace(VirtualAddress, PAGE_ROUND_UP(InNumberOfBytes));
+	return STATUS_SUCCESS;
 }
 
 /// <summary>
-/// Allocates memory from a specific pool.
+/// Maps physical memory and write data to it.
 /// </summary>
-/// <param name="InPoolType">The type of pool.</param>
-/// <param name="InNumberOfBytes">The number of bytes.</param>
-PVOID CkAllocatePool(POOL_TYPE InPoolType, SIZE_T InNumberOfBytes)
+/// <param name="InPhysicalAddress">The physical address.</param>
+/// <param name="InBuffer">The buffer.</param>
+/// <param name="InNumberOfBytes">The number of bytes to write.</param>
+NTSTATUS MmWritePhysicalMemory(LARGE_INTEGER InPhysicalAddress, PVOID InBuffer, SIZE_T InNumberOfBytes)
 {
-	return CkAllocatePoolWithTag(InPoolType, InNumberOfBytes, EASYNT_ALLOCATION_TAG);
-}
+	CONST PVOID VirtualAddress = MmMapIoSpace(InPhysicalAddress, PAGE_ROUND_UP(InNumberOfBytes), MmNonCached);
 
-/// <summary>
-/// Releases memory located at the given address.
-/// </summary>
-/// <param name="InAddress">The address of the pool allocation.</param>
-/// <param name="InTag">The tag.</param>
-void CkFreePoolWithTag(PVOID InAddress, ULONG InTag)
-{
-	if (InAddress == nullptr)
-		return;
+	if (VirtualAddress == nullptr)
+		return STATUS_INTERNAL_ERROR;
 
-	ExFreePoolWithTag(InAddress, InTag);
-}
-
-/// <summary>
-/// Releases memory located at the given address.
-/// </summary>
-/// <param name="InAddress">The address of the pool allocation.</param>
-void CkFreePool(PVOID InAddress)
-{
-	CkFreePoolWithTag(InAddress, EASYNT_ALLOCATION_TAG);
+	RtlCopyMemory(VirtualAddress, InBuffer, InNumberOfBytes);
+	MmUnmapIoSpace(VirtualAddress, PAGE_ROUND_UP(InNumberOfBytes));
+	return STATUS_SUCCESS;
 }
