@@ -8,6 +8,7 @@
 #include <ntifs.h>
 #include <tchar.h>
 #include <wdm.h>
+#include <ntstrsafe.h>
 
 // 
 // Include the process hacker headers.

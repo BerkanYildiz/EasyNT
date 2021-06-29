@@ -5,7 +5,6 @@
 // 
 
 typedef UINT64	QWORD;		// QWORD	= unsigned 64 bit value
-typedef UINT32	DWORD;		// DWORD	= unsigned 32 bit value
 typedef UINT16	WORD;		// WORD		= unsigned 16 bit value
 typedef UINT8	BYTE;		// BYTE		= unsigned  8 bit value
 

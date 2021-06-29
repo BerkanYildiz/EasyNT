@@ -64,6 +64,7 @@
     <ClCompile Include="Sources\Extensions\InterfaceExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\MemoryExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\ModuleExtensions.cpp" />
+    <ClCompile Include="Sources\Extensions\PointerExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\ProcessExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\RandomExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\ScanExtensions.cpp" />
@@ -128,6 +129,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <Driver_SpectreMitigation>false</Driver_SpectreMitigation>
+    <DriverTargetPlatform>Universal</DriverTargetPlatform>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <TargetVersion>Windows10</TargetVersion>
@@ -145,6 +147,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <DriverTargetPlatform>Universal</DriverTargetPlatform>
     <CharacterSet>Unicode</CharacterSet>
+    <Driver_SpectreMitigation>false</Driver_SpectreMitigation>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
     <TargetVersion>Windows10</TargetVersion>
@@ -182,7 +185,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <OutDir>$(SolutionDir)builds\$(Platform)\$(ConfigurationName)\</OutDir>
     <IntDir>$(SolutionDir)builds\$(Platform)\$(ConfigurationName)\obj\$(ProjectName)\</IntDir>
-    <TargetName>$(TargetName.Replace(' ',''))</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <OutDir>$(SolutionDir)builds\$(Platform)\$(ConfigurationName)\</OutDir>
@@ -216,6 +218,8 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <WarningLevel>Level1</WarningLevel>
       <AdditionalIncludeDirectories>$(SolutionDir)libraries\phnt\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -235,6 +239,8 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <WarningLevel>Level1</WarningLevel>
       <AdditionalIncludeDirectories>$(SolutionDir)libraries\phnt\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
@@ -254,6 +260,7 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <WarningLevel>Level1</WarningLevel>
       <AdditionalIncludeDirectories>$(SolutionDir)libraries\phnt\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
@@ -262,6 +269,8 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(SolutionDir)libraries\phnt\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>Level1</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
@@ -269,6 +278,9 @@
       <PreprocessorDefinitions>WINAPI_FAMILY=WINAPI_FAMILY_DESKTOP_APP;WINAPI_PARTITION_DESKTOP=1;WINAPI_PARTITION_SYSTEM=1;WINAPI_PARTITION_APP=1;WINAPI_PARTITION_PC_APP=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(SolutionDir)libraries\phnt\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <WarningLevel>Level1</WarningLevel>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

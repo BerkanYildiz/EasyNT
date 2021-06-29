@@ -134,5 +134,8 @@
     <ClCompile Include="Sources\Extensions\ConversionExtensions.cpp">
       <Filter>Source Files\Extensions</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Extensions\PointerExtensions.cpp">
+      <Filter>Source Files\Extensions</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -86,6 +86,20 @@ NTSTATUS PsGetProcessInformation(CONST WCHAR* InProcessName, OUT SYSTEM_PROCESS_
 NTSTATUS PsGetProcessInformation(CONST CHAR* InProcessName, OUT SYSTEM_PROCESS_INFORMATION* OutProcessInformation);
 
 /// <summary>
+/// Gets information about the process with the given process id.
+/// </summary>
+/// <param name="InProcessId">The process identifier.</param>
+/// <param name="OutProcessInformation">The returned process information.</param>
+NTSTATUS PsGetProcessInformation(CONST HANDLE InProcessId, OUT SYSTEM_PROCESS_INFORMATION* OutProcessInformation);
+
+/// <summary>
+/// Gets information about the process with the given process object.
+/// </summary>
+/// <param name="InProcess">The process object.</param>
+/// <param name="OutProcessInformation">The returned process information.</param>
+NTSTATUS PsGetProcessInformation(CONST PEPROCESS InProcess, OUT SYSTEM_PROCESS_INFORMATION* OutProcessInformation);
+
+/// <summary>
 /// Gets the image file path of the given process.
 /// </summary>
 /// <param name="InProcess">The process object.</param>

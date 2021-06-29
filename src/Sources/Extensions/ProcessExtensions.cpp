@@ -14,9 +14,7 @@ NTSTATUS PsGetProcesses(OUT SYSTEM_PROCESS_INFORMATION** OutProcessEntries, OPTI
 	// 
 
 	if (OutProcessEntries == NULL)
-	{
 		return STATUS_INVALID_PARAMETER_2;
-	}
 
 	// 
 	// Retrieve the process entries.
@@ -89,9 +87,7 @@ NTSTATUS PsGetProcesses(OUT SYSTEM_PROCESS_INFORMATION** OutProcessEntries, OPTI
 			// 
 
 			if (ProcessEntry->NextEntryOffset == 0)
-			{
 				break;
-			}
 		}
 
         *OutNumberOfProcessEntries = NumberOfProcessEntries;
@@ -116,9 +112,7 @@ NTSTATUS PsGetProcesses(UNICODE_STRING InProcessName, OUT SYSTEM_PROCESS_INFORMA
 	// 
     
 	if (InProcessName.Buffer == NULL)
-	{
 		return STATUS_INVALID_PARAMETER_1;
-	}
 
 	// 
 	// Retrieve every process entries on this system.
@@ -128,9 +122,7 @@ NTSTATUS PsGetProcesses(UNICODE_STRING InProcessName, OUT SYSTEM_PROCESS_INFORMA
 	ULONG NumberOfProcessEntries = 0;
 
 	if (!NT_SUCCESS(Status = PsGetProcesses(&ProcessEntries, &NumberOfProcessEntries)))
-	{
 		return Status;
-	}
 
 	// 
 	// Count the number of processes that matches the search.
@@ -154,9 +146,7 @@ NTSTATUS PsGetProcesses(UNICODE_STRING InProcessName, OUT SYSTEM_PROCESS_INFORMA
 		// 
 
 		if (ProcessEntry->NextEntryOffset == 0)
-		{
 			break;
-		}
 	}
 
 	// 
@@ -283,9 +273,7 @@ NTSTATUS PsGetProcessInformation(UNICODE_STRING InProcessName, OUT SYSTEM_PROCES
 	// 
     
 	if (InProcessName.Buffer == NULL)
-	{
 		return STATUS_INVALID_PARAMETER_1;
-	}
 
 	// 
 	// Retrieve every process entries on this system.
@@ -295,9 +283,7 @@ NTSTATUS PsGetProcessInformation(UNICODE_STRING InProcessName, OUT SYSTEM_PROCES
 	ULONG NumberOfProcessEntries = 0;
 
 	if (!NT_SUCCESS(Status = PsGetProcesses(&ProcessEntries, &NumberOfProcessEntries)))
-	{
 		return Status;
-	}
 
 	// 
 	// Loop thru each process entries...
@@ -324,9 +310,7 @@ NTSTATUS PsGetProcessInformation(UNICODE_STRING InProcessName, OUT SYSTEM_PROCES
 		// 
 
 		if (ProcessEntry->NextEntryOffset == 0)
-		{
 			break;
-		}
 	}
 
 	// 
@@ -342,18 +326,14 @@ NTSTATUS PsGetProcessInformation(UNICODE_STRING InProcessName, OUT SYSTEM_PROCES
 	if (WasSearchSuccessful)
 	{
 		if (OutProcessInformation != NULL)
-		{
 			*OutProcessInformation = ProcessInformation;
-		}
 
 		// 
 		// The image name was in the buffer we just released.
 		// 
 
 		if (OutProcessInformation != NULL)
-		{
 			RtlZeroMemory(&OutProcessInformation->ImageName, sizeof(OutProcessInformation->ImageName));
-		}
 	}
 
 	return WasSearchSuccessful ? STATUS_SUCCESS : STATUS_NOT_FOUND;
@@ -388,6 +368,103 @@ NTSTATUS PsGetProcessInformation(CONST CHAR* InProcessName, OUT SYSTEM_PROCESS_I
     CONST NTSTATUS Status = PsGetProcessInformation(ProcessName, OutProcessInformation);
     RtlFreeUnicodeString(&ProcessName);
     return Status;
+}
+
+/// <summary>
+/// Gets information about the process with the given process id.
+/// </summary>
+/// <param name="InProcessId">The process identifier.</param>
+/// <param name="OutProcessInformation">The returned process information.</param>
+NTSTATUS PsGetProcessInformation(CONST HANDLE InProcessId, OUT SYSTEM_PROCESS_INFORMATION* OutProcessInformation)
+{
+	NTSTATUS Status = { };
+
+	// 
+	// Verify the passed parameters.
+	// 
+    
+	if (InProcessId == NULL)
+		return STATUS_INVALID_PARAMETER_1;
+
+	// 
+	// Retrieve every process entries on this system.
+	// 
+
+	SYSTEM_PROCESS_INFORMATION* ProcessEntries = NULL;
+	ULONG NumberOfProcessEntries = 0;
+
+	if (!NT_SUCCESS(Status = PsGetProcesses(&ProcessEntries, &NumberOfProcessEntries)))
+		return Status;
+
+	// 
+	// Loop thru each process entries...
+	// 
+	
+	BOOLEAN WasSearchSuccessful = FALSE;
+	SYSTEM_PROCESS_INFORMATION ProcessInformation = { };
+
+	for (auto* ProcessEntry = ProcessEntries; ; ProcessEntry = (SYSTEM_PROCESS_INFORMATION*) RtlAddOffsetToPointer(ProcessEntry, ProcessEntry->NextEntryOffset))
+	{
+		// 
+		// Check if this is the process we are searching for.
+		// 
+        
+		if (ProcessEntry->UniqueProcessId == InProcessId)
+		{
+			WasSearchSuccessful = TRUE;
+			ProcessInformation = *ProcessEntry;
+			break;
+		}
+
+		// 
+		// Check if this is the last entry in the list.
+		// 
+
+		if (ProcessEntry->NextEntryOffset == 0)
+			break;
+	}
+
+	// 
+	// Release the memory allocated for the process entries.
+	// 
+
+    CkFreePool(ProcessEntries);
+
+	// 
+	// Return the result.
+	// 
+
+	if (WasSearchSuccessful)
+	{
+		if (OutProcessInformation != NULL)
+			*OutProcessInformation = ProcessInformation;
+
+		// 
+		// The image name was in the buffer we just released.
+		// 
+
+		if (OutProcessInformation != NULL)
+			RtlZeroMemory(&OutProcessInformation->ImageName, sizeof(OutProcessInformation->ImageName));
+	}
+
+	return WasSearchSuccessful ? STATUS_SUCCESS : STATUS_NOT_FOUND;
+}
+
+/// <summary>
+/// Gets information about the process with the given process object.
+/// </summary>
+/// <param name="InProcess">The process object.</param>
+/// <param name="OutProcessInformation">The returned process information.</param>
+NTSTATUS PsGetProcessInformation(CONST PEPROCESS InProcess, OUT SYSTEM_PROCESS_INFORMATION* OutProcessInformation)
+{
+	// 
+	// Verify the passed parameters.
+	// 
+
+	if (InProcess == nullptr)
+		return STATUS_INVALID_PARAMETER_1;
+
+	return PsGetProcessInformation(PsGetProcessId(InProcess), OutProcessInformation);
 }
 
 /// <summary>
