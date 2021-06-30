@@ -32,6 +32,16 @@ EXTERN_C NTKERNELAPI NTSTATUS ObReferenceObjectByName(
     PVOID *ObjectPtr
 );
 
+EXTERN_C NTKERNELAPI NTSTATUS MmCopyVirtualMemory(
+	CONST PEPROCESS SourceProcess,
+	CONST PVOID SourceAddress,
+	CONST PEPROCESS TargetProcess,
+	PVOID TargetAddress,
+	SIZE_T BufferSize,
+	KPROCESSOR_MODE PreviousMode,
+	PSIZE_T ReturnSize
+);
+
 // 
 // Non-documented or exported defines for executables formats.
 // 

@@ -103,3 +103,26 @@ BOOLEAN RtlArrayMatchAll(CONST TEntry* InArray, SIZE_T InNumberOfElements, CONST
 	
 	return Context.MatchAll;
 }
+
+/// <summary>
+/// Reverse the order of the values inside an array.
+/// </summary>
+/// <typeparam name="TEntry">The type of the entries in the array.</typeparam>
+/// <param name="InArray">The array.</param>
+/// <param name="InNumberOfElements">The number of elements in the array.</param>
+template <typename TEntry>
+VOID RtlArrayReverse(TEntry* InArray, SIZE_T InNumberOfElements)
+{
+	if (InArray == nullptr)
+		return;
+
+	if (InNumberOfElements == 0)
+		return;
+
+	for (SIZE_T I = 0; I < InNumberOfElements / 2u; I++)
+	{
+		CONST TEntry PreviousValue = InArray[I];
+		InArray[I] = InArray[InNumberOfElements - I - 1];
+		InArray[InNumberOfElements - I - 1] = PreviousValue;
+	}
+}

@@ -84,6 +84,9 @@
     <ClInclude Include="Headers\Extensions\ConversionExtensions.hpp">
       <Filter>Header Files\Extensions</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\Extensions\PhysicalMemoryExtensions.hpp">
+      <Filter>Header Files\Extensions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\EasyNT.cpp">
@@ -138,6 +141,9 @@
       <Filter>Source Files\Extensions</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Extensions\FileExtensions.cpp">
+      <Filter>Source Files\Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Extensions\PhysicalMemoryExtensions.cpp">
       <Filter>Source Files\Extensions</Filter>
     </ClCompile>
   </ItemGroup>

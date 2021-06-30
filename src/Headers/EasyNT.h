@@ -44,6 +44,7 @@
 
 #include "Extensions/PointerExtensions.hpp"
 #include "Extensions/MemoryExtensions.hpp"
+#include "Extensions/PhysicalMemoryExtensions.hpp"
 #include "Extensions/StringExtensions.hpp"
 #include "Extensions/VersionExtensions.hpp"
 #include "Extensions/TimeExtensions.hpp"
