@@ -1,6 +1,13 @@
 #pragma once
 
 // 
+// One of the new "developers" (they had to fill the quota for their diversity program) had sex with
+// the compiler and some of the main windows headers files and gave it STDs so now you cannot compile without this define. :))
+// 
+
+#define _NO_CRT_STDIO_INLINE
+
+// 
 // Include the basic windows kernel headers.
 // 
 
@@ -24,14 +31,6 @@
 // 
 
 #include "EasyNTAPI.h"
-
-// 
-// Define the library globals.
-// 
-
-#define LOGGER_NT_VERSION_MAJOR 1
-#define LOGGER_NT_VERSION_MINOR 0
-#define LOGGER_NT_VERSION_BUILD 0
 
 // 
 // Include the memory manager.
