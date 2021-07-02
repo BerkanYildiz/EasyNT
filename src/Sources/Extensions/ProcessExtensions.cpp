@@ -481,14 +481,10 @@ NTSTATUS PsGetProcessImageFilePath(CONST PEPROCESS InProcess, OUT WCHAR** OutPro
 	// 
 
 	if (InProcess == NULL)
-	{
 		return STATUS_INVALID_PARAMETER_1;
-	}
 
 	if (OutProcessName == NULL)
-	{
 		return STATUS_INVALID_PARAMETER_2;
-	}
 
 	// 
 	// If this is a special process...
@@ -518,16 +514,8 @@ NTSTATUS PsGetProcessImageFilePath(CONST PEPROCESS InProcess, OUT WCHAR** OutPro
 	auto* ProcessHandle = ZwCurrentProcess();
 
 	if (PsGetCurrentProcess() != InProcess)
-	{
-		// 
-		// Open a handle to the process.
-		// 
-
 		if (!NT_SUCCESS(Status = ObOpenObjectByPointer(InProcess, OBJ_KERNEL_HANDLE, NULL, GENERIC_ALL, *PsProcessType, KernelMode, &ProcessHandle)))
-		{
 			return Status;
-		}
-	}
 
 	// 
 	// Retrieve the name of the process with the given PID.
@@ -591,9 +579,7 @@ NTSTATUS PsGetProcessImageFilePath(CONST PEPROCESS InProcess, OUT WCHAR** OutPro
 	// 
 
 	if (ProcessHandle != ZwCurrentProcess())
-	{
 		ZwClose(ProcessHandle);
-	}
 
 	// 
 	// Move the string to the beginning of the buffer.
@@ -616,6 +602,8 @@ NTSTATUS PsGetProcessImageFilePath(CONST PEPROCESS InProcess, OUT WCHAR** OutPro
 
 	if (OutProcessName != nullptr)
 		*OutProcessName = (WCHAR*) Buffer;
+	else
+		CkFreePool(Buffer);
 	
 	return Status;
 }
@@ -636,9 +624,7 @@ NTSTATUS PsGetProcessImageFileName(CONST PEPROCESS InProcess, OUT WCHAR** OutPro
 	WCHAR* FullProcessFilePath;
 
 	if (!NT_SUCCESS(Status = PsGetProcessImageFilePath(InProcess, &FullProcessFilePath)))
-	{
 		return Status;
-	}
 
 	// 
 	// Format the path to only get the actual filename with its extension.
@@ -677,9 +663,7 @@ NTSTATUS PsTerminateProcess(CONST PEPROCESS InProcess, NTSTATUS InExitStatus)
 	// 
 
 	if (InProcess == NULL)
-	{
 		return STATUS_INVALID_PARAMETER_1;
-	}
 
 	// 
 	// Open a handle to the process.
@@ -688,9 +672,7 @@ NTSTATUS PsTerminateProcess(CONST PEPROCESS InProcess, NTSTATUS InExitStatus)
 	HANDLE Handle = NULL;
 				
 	if (!NT_SUCCESS(Status = ObOpenObjectByPointer(InProcess, OBJ_KERNEL_HANDLE, NULL, PROCESS_TERMINATE, NULL, KernelMode, &Handle)))
-	{
 		return Status;
-	}
 
 	// 
 	// Terminate the process.
@@ -717,9 +699,7 @@ BOOLEAN PsProcessIsTerminating(CONST PEPROCESS InProcess)
 	// 
 
 	if (InProcess == NULL)
-	{
 		return FALSE;
-	}
 	
 	// 
 	// Check if the given process's object header has been set.

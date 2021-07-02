@@ -1,7 +1,7 @@
 #pragma once
 
 typedef bool(* ENUMERATE_VIRTUAL_MEMORY)(ULONG InIndex, MEMORY_BASIC_INFORMATION* InMemoryInformation);
-typedef bool(* ENUMERATE_VIRTUAL_MEMORY_WITH_CONTEXT)(ULONG InIndex, MEMORY_BASIC_INFORMATION* InMemoryInformation, VOID* InContext);
+typedef bool(* ENUMERATE_VIRTUAL_MEMORY_WITH_CONTEXT)(ULONG InIndex, MEMORY_BASIC_INFORMATION* InMemoryInformation, PVOID InContext);
 
 /// <summary>
 /// Allocate virtual memory in a given process.
@@ -64,7 +64,8 @@ NTSTATUS CkQueryVirtualMemory(CONST PEPROCESS InProcess, CONST PVOID InVirtualAd
 /// <param name="InProcess">The process.</param>
 /// <param name="InContext">The context.</param>
 /// <param name="InCallback">The callback.</param>
-NTSTATUS CkEnumerateVirtualMemory(CONST PEPROCESS InProcess, PVOID InContext, ENUMERATE_VIRTUAL_MEMORY_WITH_CONTEXT InCallback);
+template <typename TContext = PVOID>
+NTSTATUS CkEnumerateVirtualMemory(CONST PEPROCESS InProcess, TContext InContext, bool(* InCallback)(ULONG InIndex, MEMORY_BASIC_INFORMATION* InMemoryInformation, TContext InContext));
 
 /// <summary>
 /// Enumerates the memory regions in the given process and execute a callback for each entries.
@@ -81,7 +82,8 @@ NTSTATUS CkEnumerateVirtualMemory(CONST PEPROCESS InProcess, ENUMERATE_VIRTUAL_M
 /// <param name="InNumberOfBytes">The number of bytes.</param>
 /// <param name="InContext">The context.</param>
 /// <param name="InCallback">The callback.</param>
-NTSTATUS CkEnumerateVirtualMemoryInRange(CONST PEPROCESS InProcess, CONST PVOID InBaseAddress, SIZE_T InNumberOfBytes, PVOID InContext, ENUMERATE_VIRTUAL_MEMORY_WITH_CONTEXT InCallback);
+template <typename TContext = PVOID>
+NTSTATUS CkEnumerateVirtualMemoryInRange(CONST PEPROCESS InProcess, CONST PVOID InBaseAddress, SIZE_T InNumberOfBytes, TContext InContext, bool(* InCallback)(ULONG InIndex, MEMORY_BASIC_INFORMATION* InMemoryInformation, TContext InContext));
 
 /// <summary>
 /// Enumerates the memory regions in the given process and execute a callback for each entries inside the specified range.

@@ -55,6 +55,14 @@ UINT32 RtlRandomInteger()
 }
 
 /// <summary>
+/// Generates a random boolean value, which can be either false or true.
+/// </summary>
+BOOLEAN RtlRandomBoolean()
+{
+	return RtlRandomInteger() % 2 == 0;
+}
+
+/// <summary>
 /// Generates a random character from the given string.
 /// </summary>
 /// <param name="InValidCharacters">The charset to select characters from.</param>

@@ -380,8 +380,8 @@ NTSTATUS PsGetProcessModuleInformationByAddress(CONST PEPROCESS InProcess, CONST
 		// Check if the given virtual address points inside this module's address range.
 		// 
 
-		if (InModuleAddress >= Module->ImageBase &&
-			InModuleAddress < RtlAddOffsetToPointer(Module->ImageBase, Module->ImageSize))
+		if (InModuleAddress >= Modules[I].ImageBase &&
+			InModuleAddress < RtlAddOffsetToPointer(Modules[I].ImageBase, Modules[I].ImageSize))
 		{
 			HasFoundModule = TRUE;
 			Module = &Modules[I];

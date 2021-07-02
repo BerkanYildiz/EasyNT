@@ -7,20 +7,20 @@
 /// <param name="InSize">The size of the region in bytes.</param>
 /// <param name="InSignature">The signature.</param>
 /// <param name="OutResult">The result.</param>
-BOOLEAN CkTryFindPattern(CONST PVOID InBaseAddress, SIZE_T InSize, CONST CHAR* InSignature, OPTIONAL OUT PVOID* OutResult)
+NTSTATUS CkTryFindPattern(CONST PVOID InBaseAddress, SIZE_T InSize, CONST CHAR* InSignature, OPTIONAL OUT PVOID* OutResult)
 {
 	// 
 	// Verify the passed parameters.
 	// 
 
 	if (InBaseAddress == nullptr)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_1;
 
 	if (InSize == 0)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_2;
 
 	if (InSignature == nullptr)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_3;
 
 	// 
 	// Setup the scan structures.
@@ -84,7 +84,7 @@ BOOLEAN CkTryFindPattern(CONST PVOID InBaseAddress, SIZE_T InSize, CONST CHAR* I
 	// 
 	
 	if (InSize < SignatureLength)
-		return FALSE;
+		return STATUS_ARRAY_BOUNDS_EXCEEDED;
 
 	// 
 	// Loop through the memory region.
@@ -121,14 +121,14 @@ BOOLEAN CkTryFindPattern(CONST PVOID InBaseAddress, SIZE_T InSize, CONST CHAR* I
 				if (OutResult != nullptr)
 					*OutResult = RtlAddOffsetToPointer(InBaseAddress, X);
 
-				return TRUE;
+				return STATUS_SUCCESS;
 			}
 
 			break;
 		}
 	}
 
-	return FALSE;
+	return STATUS_NOT_FOUND;
 }
 
 /// <summary>
@@ -139,20 +139,27 @@ BOOLEAN CkTryFindPattern(CONST PVOID InBaseAddress, SIZE_T InSize, CONST CHAR* I
 /// <param name="InPaddingByte">The padding byte.</param>
 /// <param name="InPaddingLength">The padding length.</param>
 /// <param name="OutResult">The result.</param>
-BOOLEAN CkTryFindPadding(CONST PVOID InBaseAddress, SIZE_T InSize, UINT8 InPaddingByte, SIZE_T InPaddingLength, OPTIONAL OUT PVOID* OutResult)
+NTSTATUS CkTryFindPadding(CONST PVOID InBaseAddress, SIZE_T InSize, UINT8 InPaddingByte, SIZE_T InPaddingLength, OPTIONAL OUT PVOID* OutResult)
 {
 	// 
 	// Verify the passed parameters.
 	// 
 
 	if (InBaseAddress == nullptr)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_1;
 
 	if (InSize == 0)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_2;
 
 	if (InPaddingLength == 0)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_4;
+
+	// 
+	// The padding cannot be bigger than the region of memory we are about to scan.
+	// 
+
+	if (InSize < InPaddingLength)
+		return STATUS_ARRAY_BOUNDS_EXCEEDED;
 
 	// 
 	// Loop through the memory region.
@@ -184,12 +191,12 @@ BOOLEAN CkTryFindPadding(CONST PVOID InBaseAddress, SIZE_T InSize, UINT8 InPaddi
 				if (OutResult != nullptr)
 					*OutResult = RtlAddOffsetToPointer(InBaseAddress, X);
 
-				return TRUE;
+				return STATUS_SUCCESS;
 			}
 		}
 	}
 
-	return FALSE;
+	return STATUS_NOT_FOUND;
 }
 
 /// <summary>
@@ -200,20 +207,27 @@ BOOLEAN CkTryFindPadding(CONST PVOID InBaseAddress, SIZE_T InSize, UINT8 InPaddi
 /// <param name="InPaddingByte">The padding byte.</param>
 /// <param name="InPaddingLength">The padding length.</param>
 /// <param name="OutResult">The result.</param>
-BOOLEAN CkTryFindPaddingFromEnd(CONST PVOID InBaseAddress, SIZE_T InSize, UINT8 InPaddingByte, SIZE_T InPaddingLength, OPTIONAL OUT PVOID* OutResult)
+NTSTATUS CkTryFindPaddingFromEnd(CONST PVOID InBaseAddress, SIZE_T InSize, UINT8 InPaddingByte, SIZE_T InPaddingLength, OPTIONAL OUT PVOID* OutResult)
 {
 	// 
 	// Verify the passed parameters.
 	// 
 
 	if (InBaseAddress == nullptr)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_1;
 
 	if (InSize == 0)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_2;
 
 	if (InPaddingLength == 0)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_4;
+
+	// 
+	// The padding cannot be bigger than the region of memory we are about to scan.
+	// 
+
+	if (InSize < InPaddingLength)
+		return STATUS_ARRAY_BOUNDS_EXCEEDED;
 
 	// 
 	// Loop through the memory region.
@@ -245,12 +259,12 @@ BOOLEAN CkTryFindPaddingFromEnd(CONST PVOID InBaseAddress, SIZE_T InSize, UINT8 
 				if (OutResult != nullptr)
 					*OutResult = RtlAddOffsetToPointer(InBaseAddress, X);
 
-				return TRUE;
+				return STATUS_SUCCESS;
 			}
 		}
 	}
 
-	return FALSE;
+	return STATUS_NOT_FOUND;
 }
 
 /// <summary>
@@ -259,17 +273,17 @@ BOOLEAN CkTryFindPaddingFromEnd(CONST PVOID InBaseAddress, SIZE_T InSize, UINT8 
 /// <param name="InBaseAddress">The base address.</param>
 /// <param name="InSignature">The signature.</param>
 /// <param name="OutResult">The signature scan result.</param>
-BOOLEAN CkTryFindPatternInModuleExecutableSections(CONST PVOID InBaseAddress, CONST CHAR* InSignature, OPTIONAL OUT PVOID* OutResult)
+NTSTATUS CkTryFindPatternInModuleExecutableSections(CONST PVOID InBaseAddress, CONST CHAR* InSignature, OPTIONAL OUT PVOID* OutResult)
 {
 	// 
 	// Verify the passed parameters.
 	// 
 
 	if (InBaseAddress == nullptr)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_1;
 
 	if (InSignature == nullptr)
-		return FALSE;
+		return STATUS_INVALID_PARAMETER_2;
 
 	// 
 	// Setup the scan context.
@@ -342,5 +356,5 @@ BOOLEAN CkTryFindPatternInModuleExecutableSections(CONST PVOID InBaseAddress, CO
 	if (OutResult != nullptr)
 		*OutResult = ScanContext.Result;
 
-	return ScanContext.Result != NULL;
+	return ScanContext.Result != nullptr ? STATUS_SUCCESS : STATUS_NOT_FOUND;
 }
