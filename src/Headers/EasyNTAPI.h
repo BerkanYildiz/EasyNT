@@ -46,6 +46,10 @@ EXTERN_C NTKERNELAPI NTSTATUS MmCopyVirtualMemory(
 // Non-documented or exported defines for executables formats.
 // 
 
+#define IMAGE_NT_OPTIONAL_HDR32_MAGIC		 0x10b
+#define IMAGE_NT_OPTIONAL_HDR64_MAGIC		 0x20b
+#define IMAGE_ROM_OPTIONAL_HDR_MAGIC		 0x107
+
 #define IMAGE_DOS_SIGNATURE					 0x5A4D      // MZ
 #define IMAGE_OS2_SIGNATURE					 0x454E      // NE
 #define IMAGE_OS2_SIGNATURE_LE				 0x454C      // LE
@@ -241,3 +245,152 @@ typedef struct _IMAGE_NT_HEADERS {
 	IMAGE_FILE_HEADER FileHeader;
 	IMAGE_OPTIONAL_HEADER32 OptionalHeader;
 } IMAGE_NT_HEADERS32, *PIMAGE_NT_HEADERS32;
+
+typedef struct _IMAGE_EXPORT_DIRECTORY
+{
+	DWORD Characteristics;
+	DWORD TimeDateStamp;
+	WORD  MajorVersion;
+	WORD  MinorVersion;
+	DWORD Name;
+	DWORD Base;
+	DWORD NumberOfFunctions;
+	DWORD NumberOfNames;
+	DWORD AddressOfFunctions;
+	DWORD AddressOfNames;
+	DWORD AddressOfNameOrdinals;
+} IMAGE_EXPORT_DIRECTORY, *PIMAGE_EXPORT_DIRECTORY;
+
+typedef struct _IMAGE_IMPORT_DESCRIPTOR
+{
+	union
+	{
+		DWORD Characteristics;
+		DWORD OriginalFirstThunk;
+	};
+	DWORD TimeDateStamp;
+	DWORD ForwarderChain;
+	DWORD Name;
+	DWORD FirstThunk;
+
+} IMAGE_IMPORT_DESCRIPTOR, *PIMAGE_IMPORT_DESCRIPTOR;
+
+
+typedef struct _IMAGE_IMPORT_BY_NAME
+{
+	WORD Hint;
+	BYTE Name[1];
+
+} IMAGE_IMPORT_BY_NAME, *PIMAGE_IMPORT_BY_NAME;
+
+typedef struct _IMAGE_THUNK_DATA32
+{
+	union
+	{
+		DWORD ForwarderString;
+		DWORD Function;
+		DWORD Ordinal;
+		DWORD AddressOfData;
+	} u1;
+
+} IMAGE_THUNK_DATA32, *PIMAGE_THUNK_DATA32;
+
+typedef struct _IMAGE_THUNK_DATA64
+{
+	union
+	{
+		ULONGLONG ForwarderString;
+		ULONGLONG Function;
+		ULONGLONG Ordinal;
+		ULONGLONG AddressOfData;
+	} u1;
+
+} IMAGE_THUNK_DATA64, *PIMAGE_THUNK_DATA64;
+
+typedef struct _IMAGE_RESOURCE_DIRECTORY_ENTRY
+{
+	DWORD Name;
+	DWORD OffsetToData;
+} IMAGE_RESOURCE_DIRECTORY_ENTRY, *PIMAGE_RESOURCE_DIRECTORY_ENTRY;
+
+
+typedef struct _IMAGE_RESOURCE_DATA_ENTRY
+{
+	DWORD OffsetToData;
+	DWORD Size;
+	DWORD CodePage;
+	DWORD Reserved;
+} IMAGE_RESOURCE_DATA_ENTRY, *PIMAGE_RESOURCE_DATA_ENTRY;
+
+typedef struct _IMAGE_RESOURCE_DIRECTORY
+{
+	DWORD Characteristics;
+	DWORD TimeDateStamp;
+	WORD  MajorVersion;
+	WORD  MinorVersion;
+	WORD  NumberOfNamedEntries;
+	WORD  NumberOfIdEntries;
+} IMAGE_RESOURCE_DIRECTORY, *PIMAGE_RESOURCE_DIRECTORY;
+
+typedef struct _IMAGE_DEBUG_DIRECTORY {
+	DWORD Characteristics;
+	DWORD TimeDateStamp;
+	WORD  MajorVersion;
+	WORD  MinorVersion;
+	DWORD Type;
+	DWORD SizeOfData;
+	DWORD AddressOfRawData;
+	DWORD PointerToRawData;
+} IMAGE_DEBUG_DIRECTORY, *PIMAGE_DEBUG_DIRECTORY;
+
+typedef struct _IMAGE_LOAD_CONFIG_CODE_INTEGRITY {
+    WORD    Flags;          // Flags to indicate if CI information is available, etc.
+    WORD    Catalog;        // 0xFFFF means not available
+    DWORD   CatalogOffset;
+    DWORD   Reserved;       // Additional bitmask to be defined later
+} IMAGE_LOAD_CONFIG_CODE_INTEGRITY, *PIMAGE_LOAD_CONFIG_CODE_INTEGRITY;
+
+typedef struct _IMAGE_LOAD_CONFIG_DIRECTORY64 {
+	DWORD                            Size;
+	DWORD                            TimeDateStamp;
+	WORD                             MajorVersion;
+	WORD                             MinorVersion;
+	DWORD                            GlobalFlagsClear;
+	DWORD                            GlobalFlagsSet;
+	DWORD                            CriticalSectionDefaultTimeout;
+	ULONGLONG                        DeCommitFreeBlockThreshold;
+	ULONGLONG                        DeCommitTotalFreeThreshold;
+	ULONGLONG                        LockPrefixTable;
+	ULONGLONG                        MaximumAllocationSize;
+	ULONGLONG                        VirtualMemoryThreshold;
+	ULONGLONG                        ProcessAffinityMask;
+	DWORD                            ProcessHeapFlags;
+	WORD                             CSDVersion;
+	WORD                             DependentLoadFlags;
+	ULONGLONG                        EditList;
+	ULONGLONG                        SecurityCookie;
+	ULONGLONG                        SEHandlerTable;
+	ULONGLONG                        SEHandlerCount;
+	ULONGLONG                        GuardCFCheckFunctionPointer;
+	ULONGLONG                        GuardCFDispatchFunctionPointer;
+	ULONGLONG                        GuardCFFunctionTable;
+	ULONGLONG                        GuardCFFunctionCount;
+	DWORD                            GuardFlags;
+	IMAGE_LOAD_CONFIG_CODE_INTEGRITY CodeIntegrity;
+	ULONGLONG                        GuardAddressTakenIatEntryTable;
+	ULONGLONG                        GuardAddressTakenIatEntryCount;
+	ULONGLONG                        GuardLongJumpTargetTable;
+	ULONGLONG                        GuardLongJumpTargetCount;
+	ULONGLONG                        DynamicValueRelocTable;
+	ULONGLONG                        CHPEMetadataPointer;
+	ULONGLONG                        GuardRFFailureRoutine;
+	ULONGLONG                        GuardRFFailureRoutineFunctionPointer;
+	DWORD                            DynamicValueRelocTableOffset;
+	WORD                             DynamicValueRelocTableSection;
+	WORD                             Reserved2;
+	ULONGLONG                        GuardRFVerifyStackPointerFunctionPointer;
+	DWORD                            HotPatchTableOffset;
+	DWORD                            Reserved3;
+	ULONGLONG                        EnclaveConfigurationPointer;
+	ULONGLONG                        VolatileMetadataPointer;
+} IMAGE_LOAD_CONFIG_DIRECTORY64, *PIMAGE_LOAD_CONFIG_DIRECTORY64;
