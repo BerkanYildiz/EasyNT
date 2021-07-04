@@ -65,7 +65,57 @@ NTSTATUS CkQueryVirtualMemory(CONST PEPROCESS InProcess, CONST PVOID InVirtualAd
 /// <param name="InContext">The context.</param>
 /// <param name="InCallback">The callback.</param>
 template <typename TContext = PVOID>
-NTSTATUS CkEnumerateVirtualMemory(CONST PEPROCESS InProcess, TContext InContext, bool(* InCallback)(ULONG InIndex, MEMORY_BASIC_INFORMATION* InMemoryInformation, TContext InContext));
+NTSTATUS CkEnumerateVirtualMemory(CONST PEPROCESS InProcess, TContext InContext, bool(*InCallback)(ULONG InIndex, MEMORY_BASIC_INFORMATION* InMemoryInformation, TContext InContext))
+{
+	// 
+	// Verify the passed parameters.
+	// 
+
+	if (InProcess == nullptr)
+		return STATUS_INVALID_PARAMETER_1;
+
+	if (InContext == nullptr)
+		return STATUS_INVALID_PARAMETER_2;
+
+	if (InCallback == nullptr)
+		return STATUS_INVALID_PARAMETER_3;
+
+	// 
+	// Scan the memory regions.
+	// 
+
+	ULONG Index = 0;
+	PVOID CurrentAddress = MM_LOWEST_USER_ADDRESS;
+	
+	while (CurrentAddress < MM_HIGHEST_USER_ADDRESS)
+	{
+		// 
+		// Query information about the memory region.
+		// 
+		
+		MEMORY_BASIC_INFORMATION MemoryInformation;
+
+		if (!NT_SUCCESS(CkQueryVirtualMemory(InProcess, CurrentAddress, &MemoryInformation)))
+			break;
+
+		// 
+		// Execute the callback.
+		// 
+
+		auto const SkipOtherEntries = InCallback(Index++, &MemoryInformation, InContext);
+
+		if (SkipOtherEntries)
+			break;
+
+		// 
+		// Move onto the next region.
+		// 
+
+		CurrentAddress = RtlAddOffsetToPointer(CurrentAddress, MemoryInformation.RegionSize);
+	}
+
+	return Index != 0 ? STATUS_SUCCESS : STATUS_NO_MORE_ENTRIES;
+}
 
 /// <summary>
 /// Enumerates the memory regions in the given process and execute a callback for each entries.
@@ -83,7 +133,67 @@ NTSTATUS CkEnumerateVirtualMemory(CONST PEPROCESS InProcess, ENUMERATE_VIRTUAL_M
 /// <param name="InContext">The context.</param>
 /// <param name="InCallback">The callback.</param>
 template <typename TContext = PVOID>
-NTSTATUS CkEnumerateVirtualMemoryInRange(CONST PEPROCESS InProcess, CONST PVOID InBaseAddress, SIZE_T InNumberOfBytes, TContext InContext, bool(* InCallback)(ULONG InIndex, MEMORY_BASIC_INFORMATION* InMemoryInformation, TContext InContext));
+NTSTATUS CkEnumerateVirtualMemoryInRange(CONST PEPROCESS InProcess, CONST PVOID InBaseAddress, SIZE_T InNumberOfBytes, TContext InContext, bool(*InCallback)(ULONG InIndex, MEMORY_BASIC_INFORMATION* InMemoryInformation, TContext InContext))
+{
+	// 
+	// Verify the passed parameters.
+	// 
+
+	if (InProcess == nullptr)
+		return STATUS_INVALID_PARAMETER_1;
+	
+	if (InBaseAddress == nullptr)
+		return STATUS_INVALID_PARAMETER_2;
+	
+	if (InNumberOfBytes == 0)
+		return STATUS_INVALID_PARAMETER_3;
+
+	if (InContext == nullptr)
+		return STATUS_INVALID_PARAMETER_4;
+
+	if (InCallback == nullptr)
+		return STATUS_INVALID_PARAMETER_5;
+
+	// 
+	// Scan the memory regions.
+	// 
+
+	ULONG Index = 0;
+	PVOID CurrentAddress = InBaseAddress;
+	CONST PVOID UpperLimit = RtlAddOffsetToPointer(InBaseAddress, InNumberOfBytes);
+	
+	while (CurrentAddress < UpperLimit)
+	{
+		// 
+		// Query information about the memory region.
+		// 
+		
+		MEMORY_BASIC_INFORMATION MemoryInformation;
+
+		if (!NT_SUCCESS(CkQueryVirtualMemory(InProcess, CurrentAddress, &MemoryInformation)))
+			break;
+
+		// 
+		// Execute the callback.
+		// 
+
+		auto const SkipOtherEntries = InCallback(Index++, &MemoryInformation, InContext);
+
+		if (SkipOtherEntries)
+			break;
+
+		// 
+		// Move onto the next region.
+		// 
+
+		if (CurrentAddress > MemoryInformation.BaseAddress)
+			CurrentAddress = RtlAddOffsetToPointer(CurrentAddress, MemoryInformation.RegionSize - (SIZE_T) RtlSubOffsetFromPointer(CurrentAddress, MemoryInformation.BaseAddress));
+		else
+			CurrentAddress = RtlAddOffsetToPointer(CurrentAddress, MemoryInformation.RegionSize);
+	}
+
+	return Index != 0 ? STATUS_SUCCESS : STATUS_NO_MORE_ENTRIES;
+}
 
 /// <summary>
 /// Enumerates the memory regions in the given process and execute a callback for each entries inside the specified range.

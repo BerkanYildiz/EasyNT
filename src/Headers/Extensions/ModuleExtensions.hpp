@@ -96,11 +96,65 @@ PIMAGE_SECTION_HEADER RtlModuleSectionHeaders(CONST PVOID InBaseAddress, OPTIONA
 /// <param name="InBaseAddress">The base address.</param>
 /// <param name="InContext">The context.</param>
 /// <param name="InCallback">The callback.</param>
-NTSTATUS RtlEnumerateModuleSections(CONST PVOID InBaseAddress, PVOID InContext, ENUMERATE_MODULE_SECTIONS_WITH_CONTEXT InCallback);
+template <typename TContext>
+NTSTATUS RtlEnumerateModuleSections(CONST PVOID InBaseAddress, TContext InContext, bool(*InCallback)(ULONG InIndex, IMAGE_SECTION_HEADER* InSectionHeader, TContext InContext))
+{
+	// 
+	// Verify the passed parameters.
+	// 
+
+	if (InBaseAddress == nullptr)
+		return STATUS_INVALID_PARAMETER_1;
+
+	if (InContext == nullptr)
+		return STATUS_INVALID_PARAMETER_2;
+
+	if (InCallback == nullptr)
+		return STATUS_INVALID_PARAMETER_3;
+
+	// 
+	// Retrieve the NT headers.
+	// 
+
+	auto* const NtHeaders = RtlModuleNtHeaders(InBaseAddress);
+
+	if (NtHeaders == nullptr)
+		return STATUS_INVALID_IMAGE_FORMAT;
+	
+	// 
+	// Retrieve the section headers.
+	// 
+
+	auto* const SectionHeaders = RtlModuleSectionHeaders(InBaseAddress);
+
+	if (SectionHeaders == nullptr)
+		return STATUS_INVALID_IMAGE_FORMAT;
+
+	// 
+	// Enumerates every section headers.
+	// 
+
+	for (WORD I = 0; I < NtHeaders->FileHeader.NumberOfSections; I++)
+	{
+		if (InCallback(I, &SectionHeaders[I], InContext))
+			break;
+	}
+	
+	return STATUS_SUCCESS;
+}
 
 /// <summary>
 /// Enumerates the sections headers of the module present at the given address.
 /// </summary>
 /// <param name="InBaseAddress">The base address.</param>
 /// <param name="InCallback">The callback.</param>
-NTSTATUS RtlEnumerateModuleSections(CONST PVOID InBaseAddress, ENUMERATE_MODULE_SECTIONS_WITH_CONTEXT InCallback);
+NTSTATUS RtlEnumerateModuleSections(CONST PVOID InBaseAddress, ENUMERATE_MODULE_SECTIONS InCallback);
+
+/// <summary>
+/// Gets the address of a function exported by the specified module.
+/// </summary>
+/// <param name="InProcess">The process.</param>
+/// <param name="InBaseAddress">The base address.</param>
+/// <param name="InFunctionName">The name of the function.</param>
+/// <param name="OutFunctionAddress">The address of the function.</param>
+NTSTATUS RtlModuleFindExport(CONST PEPROCESS InProcess, CONST PVOID InBaseAddress, CONST CHAR* InFunctionName, OPTIONAL OUT PVOID* OutFunctionAddress = nullptr);

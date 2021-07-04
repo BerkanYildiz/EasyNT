@@ -305,19 +305,17 @@ NTSTATUS CkTryFindPatternInModuleExecutableSections(CONST PVOID InBaseAddress, C
 	// Enumerate the sections of the module.
 	// 
 
-	RtlEnumerateModuleSections(InBaseAddress, &ScanContext, [] (ULONG InIndex, IMAGE_SECTION_HEADER* SectionHeader, PVOID InContext) -> bool
+	RtlEnumerateModuleSections<SCAN_CONTEXT*>(InBaseAddress, &ScanContext, [] (ULONG InIndex, IMAGE_SECTION_HEADER* InSectionHeader, SCAN_CONTEXT* InContext) -> bool
 	{
-		auto* ScanContext = (SCAN_CONTEXT*) InContext;
-
 		// 
 		// Parse the section's characteristics.
 		// 
 
-		auto Executable	 = (SectionHeader->Characteristics & IMAGE_SCN_MEM_EXECUTE) != 0;
-		auto Readable	 = (SectionHeader->Characteristics & IMAGE_SCN_MEM_READ) != 0;
-		auto Writable	 = (SectionHeader->Characteristics & IMAGE_SCN_MEM_WRITE) != 0;
-		auto Discardable = (SectionHeader->Characteristics & IMAGE_SCN_MEM_DISCARDABLE) != 0;
-		auto ContainCode = (SectionHeader->Characteristics & IMAGE_SCN_CNT_CODE) != 0;
+		auto Executable	 = (InSectionHeader->Characteristics & IMAGE_SCN_MEM_EXECUTE) != 0;
+		auto Readable	 = (InSectionHeader->Characteristics & IMAGE_SCN_MEM_READ) != 0;
+		auto Writable	 = (InSectionHeader->Characteristics & IMAGE_SCN_MEM_WRITE) != 0;
+		auto Discardable = (InSectionHeader->Characteristics & IMAGE_SCN_MEM_DISCARDABLE) != 0;
+		auto ContainCode = (InSectionHeader->Characteristics & IMAGE_SCN_CNT_CODE) != 0;
 
 		// 
 		// Discardable sections are not mapped.
@@ -337,7 +335,7 @@ NTSTATUS CkTryFindPatternInModuleExecutableSections(CONST PVOID InBaseAddress, C
 		// Verify the validity of the address.
 		// 
 
-		auto* SectionData = RtlAddOffsetToPointer(ScanContext->BaseAddress, SectionHeader->VirtualAddress);
+		auto* SectionData = RtlAddOffsetToPointer(InContext->BaseAddress, InSectionHeader->VirtualAddress);
 
 		if (!MmIsAddressValid(SectionData))
 			return FALSE;
@@ -346,7 +344,7 @@ NTSTATUS CkTryFindPatternInModuleExecutableSections(CONST PVOID InBaseAddress, C
 		// Scan this section.
 		// 
 
-		return CkTryFindPattern(SectionData, SectionHeader->Misc.VirtualSize, ScanContext->Signature, &ScanContext->Result);
+		return NT_SUCCESS(CkTryFindPattern(SectionData, InSectionHeader->Misc.VirtualSize, InContext->Signature, &InContext->Result));
 	});
 
 	// 
