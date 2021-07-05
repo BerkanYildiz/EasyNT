@@ -42,6 +42,11 @@ EXTERN_C NTKERNELAPI NTSTATUS MmCopyVirtualMemory(
 	PSIZE_T ReturnSize
 );
 
+EXTERN_C NTKERNELAPI PVOID RtlFindExportedRoutineByName(
+	CONST PVOID DllBase,
+	CONST CHAR* RoutineName
+);
+
 EXTERN_C NTSTATUS NTAPI PsAcquireProcessExitSynchronization(
 	IN CONST PEPROCESS Process
 );

@@ -105,6 +105,37 @@ BOOLEAN RtlArrayMatchAll(CONST TEntry* InArray, SIZE_T InNumberOfElements, CONST
 }
 
 /// <summary>
+/// Enumerates an array and execute a comparer callback on each entries.
+/// </summary>
+/// <typeparam name="TEntry">The type of the entries in the array.</typeparam>
+/// <param name="InArray">The array.</param>
+/// <param name="InNumberOfElements">The number of elements in the array.</param>
+/// <param name="InComparedValue">The compared value.</param>
+template <typename TEntry>
+BOOLEAN RtlArrayMatchAny(CONST TEntry* InArray, SIZE_T InNumberOfElements, CONST TEntry InComparedValue)
+{
+	struct ARRAY_CONTEXT
+	{
+		TEntry ComparedValue;
+		BOOLEAN MatchAny;
+	};
+
+	ARRAY_CONTEXT Context;
+	Context.ComparedValue = InComparedValue;
+	Context.MatchAny = FALSE;
+	
+	RtlArrayForEach<TEntry, PVOID>((TEntry*) InArray, InNumberOfElements, &Context, [] (SIZE_T InIndex, TEntry& InEntry, PVOID InContext) -> void
+	{
+		auto* Context = (ARRAY_CONTEXT*) InContext;
+
+		if (InEntry == Context->ComparedValue)
+			Context->MatchAny = TRUE;
+	});
+	
+	return Context.MatchAny;
+}
+
+/// <summary>
 /// Reverse the order of the values inside an array.
 /// </summary>
 /// <typeparam name="TEntry">The type of the entries in the array.</typeparam>

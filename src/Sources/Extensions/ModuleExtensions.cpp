@@ -509,22 +509,48 @@ PIMAGE_SECTION_HEADER RtlModuleSectionHeaders(CONST PVOID InBaseAddress, OPTIONA
 /// Enumerates the sections headers of the module present at the given address.
 /// </summary>
 /// <param name="InBaseAddress">The base address.</param>
-/// <param name="InContext">The context.</param>
 /// <param name="InCallback">The callback.</param>
-NTSTATUS RtlEnumerateModuleSections(CONST PVOID InBaseAddress, PVOID InContext, ENUMERATE_MODULE_SECTIONS_WITH_CONTEXT InCallback)
+NTSTATUS RtlEnumerateModuleSections(CONST PVOID InBaseAddress, ENUMERATE_MODULE_SECTIONS InCallback)
 {
+	return RtlEnumerateModuleSections<ENUMERATE_MODULE_SECTIONS>(InBaseAddress, InCallback, [] (ULONG InIndex, IMAGE_SECTION_HEADER* InSectionHeader, ENUMERATE_MODULE_SECTIONS InContext) -> bool
+	{
+		return InContext(InIndex, InSectionHeader);
+	});
+}
+
+/// <summary>
+/// Gets the address of a function exported by the specified module.
+/// </summary>
+/// <param name="InProcess">The process.</param>
+/// <param name="InBaseAddress">The base address.</param>
+/// <param name="InFunctionName">The name of the function.</param>
+/// <param name="OutFunctionAddress">The address of the function.</param>
+NTSTATUS RtlModuleFindExport(CONST PEPROCESS InProcess, CONST PVOID InBaseAddress, CONST CHAR* InFunctionName, OPTIONAL OUT PVOID* OutFunctionAddress)
+{
+	NTSTATUS Status = { };
+
 	// 
 	// Verify the passed parameters.
 	// 
-
-	if (InBaseAddress == nullptr)
+	
+	if (InProcess == nullptr)
 		return STATUS_INVALID_PARAMETER_1;
-
-	if (InContext == nullptr)
+	
+	if (InBaseAddress == nullptr)
 		return STATUS_INVALID_PARAMETER_2;
 
-	if (InCallback == nullptr)
+	if (InFunctionName == nullptr)
 		return STATUS_INVALID_PARAMETER_3;
+
+	if (OutFunctionAddress == nullptr)
+		return STATUS_INVALID_PARAMETER_4;
+
+	// 
+	// Attach to the process.
+	// 
+
+	KAPC_STATE ApcState = { };
+	KeStackAttachProcess(InProcess, &ApcState);
 
 	// 
 	// Retrieve the NT headers.
@@ -533,40 +559,190 @@ NTSTATUS RtlEnumerateModuleSections(CONST PVOID InBaseAddress, PVOID InContext, 
 	auto* const NtHeaders = RtlModuleNtHeaders(InBaseAddress);
 
 	if (NtHeaders == nullptr)
-		return STATUS_INVALID_IMAGE_FORMAT;
-	
-	// 
-	// Retrieve the section headers.
-	// 
-
-	auto* const SectionHeaders = RtlModuleSectionHeaders(InBaseAddress);
-
-	if (SectionHeaders == nullptr)
-		return STATUS_INVALID_IMAGE_FORMAT;
-
-	// 
-	// Enumerates every section headers.
-	// 
-
-	for (WORD I = 0; I < NtHeaders->FileHeader.NumberOfSections; I++)
 	{
-		if (InCallback(I, &SectionHeaders[I], InContext))
+		KeUnstackDetachProcess(&ApcState);
+		Status = STATUS_UNSUCCESSFUL;
+		return Status;
+	}
+
+	// 
+	// Check if the module is x64.
+	// 
+
+	if (NtHeaders->OptionalHeader.Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC)
+	{
+		KeUnstackDetachProcess(&ApcState);
+		Status = STATUS_NOT_SUPPORTED;
+		return Status;
+	}
+
+	// 
+	// Retrieve the exports directory.
+	// 
+	
+	auto* const ExportsDirectoryDescriptor = &NtHeaders->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT];
+
+	if (ExportsDirectoryDescriptor->VirtualAddress == NULL ||
+		ExportsDirectoryDescriptor->Size == 0)
+	{
+		KeUnstackDetachProcess(&ApcState);
+		Status = STATUS_NOT_SUPPORTED;
+		return Status;
+	}
+
+	// 
+	// Retrieve the arrays.
+	// 
+
+	auto* const ExportsDirectory = (IMAGE_EXPORT_DIRECTORY*) RtlAddOffsetToPointer(InBaseAddress, ExportsDirectoryDescriptor->VirtualAddress);
+	auto* const ArrayOfFunctions = (ULONG*) RtlAddOffsetToPointer(InBaseAddress, ExportsDirectory->AddressOfFunctions);
+	auto* const ArrayOfOrdinals	= (SHORT*) RtlAddOffsetToPointer(InBaseAddress, ExportsDirectory->AddressOfNameOrdinals);
+	auto* const ArrayOfNames = (ULONG*) RtlAddOffsetToPointer(InBaseAddress, ExportsDirectory->AddressOfNames);
+
+	// 
+	// For each functions in the array...
+	// 
+
+	BOOLEAN HasFoundFunction = FALSE;
+	PVOID FunctionAddress = nullptr;
+	
+	for (DWORD I = 0; I < ExportsDirectory->NumberOfFunctions; I++)
+	{
+		auto  const Ordinal = ArrayOfOrdinals[I];
+		auto  const OffsetToName = ArrayOfNames[I];
+		auto* const Name = (CHAR*) RtlAddOffsetToPointer(InBaseAddress, OffsetToName);
+		auto  const SearchedOrdinal = (ULONG_PTR) InFunctionName;
+		auto  const SearchingByOrdinal = SearchedOrdinal <= 0xFFFF;
+
+		// 
+		// If we are searching for an ordinal...
+		// 
+
+		if (SearchingByOrdinal)
+		{
+			if (SearchedOrdinal == (ULONG_PTR) ExportsDirectory->Base + I)
+			{
+				HasFoundFunction = TRUE;
+				FunctionAddress = RtlAddOffsetToPointer(InBaseAddress, ArrayOfFunctions[I]);
+				break;
+			}
+		}
+		else
+		{
+			// 
+			// We are searching by name...
+			// 
+			
+			if (I >= ExportsDirectory->NumberOfNames)
+				break;
+
+			// 
+			// Check if the name matches.
+			// 
+
+			if (!RtlEqualString(Name, InFunctionName))
+				continue;
+
+			// 
+			// Get the offset to the function.
+			// 
+			
+			auto const OffsetToFunction = ArrayOfFunctions[Ordinal];
+
+			if (OffsetToFunction <  ExportsDirectoryDescriptor->VirtualAddress ||
+				OffsetToFunction >= ExportsDirectoryDescriptor->VirtualAddress + ExportsDirectoryDescriptor->Size)
+			{
+				HasFoundFunction = TRUE;
+				FunctionAddress = RtlAddOffsetToPointer(InBaseAddress, OffsetToFunction);
+				break;
+			}
+
+			// 
+			// The function offsets points inside the exports directory,
+			// therefore it is a forwarded export/import and we need to parse it.
+			// 
+			
+			auto* const ForwardName = (CHAR*) RtlAddOffsetToPointer(InBaseAddress, OffsetToFunction);
+			auto  const ForwardNameLength = RtlStringLength(ForwardName);
+			auto* const SplitPoint = strchr(ForwardName, '.');
+			auto* const FunctionName = SplitPoint + 1;
+			auto  const ModuleNameLength = (SIZE_T) RtlSubOffsetFromPointer(SplitPoint, ForwardName) - 1;
+			auto  const FunctionNameLength = RtlStringLength(FunctionName);
+
+			// 
+			// Allocate memory for the module name and write to it.
+			// 
+
+			auto* ModuleName = (CHAR*) CkAllocatePool(NonPagedPoolNx, ModuleNameLength + sizeof(".ext"));
+			RtlCopyMemory(ModuleName, ForwardName, ModuleNameLength);
+
+			// 
+			// For each possible module extensions...
+			// 
+
+			CONST CHAR* PossibleExtensions[] = {
+				".exe",
+				".sys",
+				".dll",
+			};
+			
+			for (SIZE_T ExtensionIdx = 0; ExtensionIdx < ARRAYSIZE(PossibleExtensions); ExtensionIdx++)
+			{
+				// 
+				// Write the extension to the end of the module name.
+				// 
+
+				RtlCopyMemory(RtlAddOffsetToPointer(ModuleName, ModuleNameLength), PossibleExtensions[ExtensionIdx], strlen(PossibleExtensions[ExtensionIdx]) + 1);
+
+				// 
+				// Attempt to find a module with this name in the process.
+				// 
+
+				RTL_PROCESS_MODULE_INFORMATION ModuleInformation = { };
+
+				if (NT_SUCCESS(PsGetProcessModuleInformation(InProcess, ModuleName, &ModuleInformation)))
+				{
+					// 
+					// Check if a function with that name exists in this module.
+					// 
+
+					PVOID ForwardedFunctionAddress = nullptr;
+					
+					if (NT_SUCCESS(RtlModuleFindExport(InProcess, ModuleInformation.ImageBase, FunctionName, &ForwardedFunctionAddress)))
+					{
+						HasFoundFunction = TRUE;
+						FunctionAddress = ForwardedFunctionAddress;
+						CkFreePool(ModuleName);
+						break;
+					}
+				}
+			}
+
+			// 
+			// This was the function we were looking for, exit...
+			// 
+
 			break;
+		}
+	}
+
+	// 
+	// Detach from the process.
+	// 
+
+	KeUnstackDetachProcess(&ApcState);
+
+	// 
+	// Return the result.
+	// 
+
+	if (HasFoundFunction)
+	{
+		if (OutFunctionAddress != nullptr)
+			*OutFunctionAddress = FunctionAddress;
+		
+		return STATUS_SUCCESS;
 	}
 	
-	return STATUS_SUCCESS;
-}
-
-/// <summary>
-/// Enumerates the sections headers of the module present at the given address.
-/// </summary>
-/// <param name="InBaseAddress">The base address.</param>
-/// <param name="InCallback">The callback.</param>
-NTSTATUS RtlEnumerateModuleSections(CONST PVOID InBaseAddress, ENUMERATE_MODULE_SECTIONS InCallback)
-{
-	return RtlEnumerateModuleSections(InBaseAddress, InCallback, [] (ULONG InIndex, IMAGE_SECTION_HEADER* InSectionHeader, PVOID InContext) -> bool
-	{
-		auto* Callback = (ENUMERATE_MODULE_SECTIONS) InContext;
-		return Callback(InIndex, InSectionHeader);
-	});
+    return NT_SUCCESS(Status) ? STATUS_NOT_FOUND : Status;
 }
