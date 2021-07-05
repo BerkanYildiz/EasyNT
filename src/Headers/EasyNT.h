@@ -16,6 +16,7 @@
 #include <tchar.h>
 #include <wdm.h>
 #include <ntstrsafe.h>
+#include <intrin.h>
 
 // 
 // Include the process hacker headers.

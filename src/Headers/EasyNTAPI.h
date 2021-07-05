@@ -42,6 +42,14 @@ EXTERN_C NTKERNELAPI NTSTATUS MmCopyVirtualMemory(
 	PSIZE_T ReturnSize
 );
 
+EXTERN_C NTSTATUS NTAPI PsAcquireProcessExitSynchronization(
+	IN CONST PEPROCESS Process
+);
+
+EXTERN_C NTSTATUS NTAPI PsReleaseProcessExitSynchronization(
+	IN CONST PEPROCESS Process
+);
+
 // 
 // Non-documented or exported defines for executables formats.
 // 
@@ -55,7 +63,10 @@ EXTERN_C NTKERNELAPI NTSTATUS MmCopyVirtualMemory(
 #define IMAGE_OS2_SIGNATURE_LE				 0x454C      // LE
 #define IMAGE_NT_SIGNATURE					 0x00004550  // PE00
 #define IMAGE_SIZEOF_SHORT_NAME              8
-#define IMAGE_NUMBEROF_DIRECTORY_ENTRIES    16
+#define IMAGE_NUMBEROF_DIRECTORY_ENTRIES	 16
+
+#define IMAGE_FILE_MACHINE_I386				 0x014c
+#define IMAGE_FILE_MACHINE_AMD64			 0x8664
 
 #define IMAGE_DIRECTORY_ENTRY_EXPORT          0   // Export Directory
 #define IMAGE_DIRECTORY_ENTRY_IMPORT          1   // Import Directory
