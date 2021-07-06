@@ -42,6 +42,14 @@ EXTERN_C NTKERNELAPI NTSTATUS MmCopyVirtualMemory(
 	PSIZE_T ReturnSize
 );
 
+EXTERN_C NTSYSAPI NTSTATUS NTAPI ZwProtectVirtualMemory(
+	IN HANDLE               ProcessHandle,
+	IN OUT PVOID*			BaseAddress,
+	IN OUT SIZE_T*          NumberOfBytesToProtect,
+	IN ULONG                NewAccessProtection,
+	OUT PULONG              OldAccessProtection
+);
+
 EXTERN_C NTKERNELAPI PVOID RtlFindExportedRoutineByName(
 	CONST PVOID DllBase,
 	CONST CHAR* RoutineName
@@ -410,3 +418,8 @@ typedef struct _IMAGE_LOAD_CONFIG_DIRECTORY64 {
 	ULONGLONG                        EnclaveConfigurationPointer;
 	ULONGLONG                        VolatileMetadataPointer;
 } IMAGE_LOAD_CONFIG_DIRECTORY64, *PIMAGE_LOAD_CONFIG_DIRECTORY64;
+
+typedef struct _IMAGE_BASE_RELOCATION {
+	ULONG  VirtualAddress;
+	ULONG  SizeOfBlock;
+} IMAGE_BASE_RELOCATION, * PIMAGE_BASE_RELOCATION;
