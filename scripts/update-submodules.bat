@@ -1,1 +1,3 @@
-git submodule update --recursive --remote ../
+cd ../
+git submodule update --recursive --remote
+cd scripts

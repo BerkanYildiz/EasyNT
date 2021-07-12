@@ -1,3 +1,5 @@
 cd ../
-git pull && git submodule init && git submodule update && git submodule status
-cd libraries
+git submodule foreach --recursive git clean -xfd
+git submodule foreach --recursive git reset --hard
+git submodule update --init --recursive
+cd scripts
