@@ -275,11 +275,6 @@ NTSTATUS CkTryFindPatternInModuleExecutableSections(CONST PVOID InBaseAddress, C
 {
 	NTSTATUS Status;
 
-	DbgPrintEx(0, 0, "CkTryFindPatternInModuleExecutableSections(...)\n");
-	DbgPrintEx(0, 0, "  - InBaseAddress: 0x%p\n", InBaseAddress);
-	DbgPrintEx(0, 0, "  - InSignature: %s\n", InSignature);
-	DbgPrintEx(0, 0, "  - OutResult: 0x%p\n", OutResult);
-	
 	// 
 	// Verify the passed parameters.
 	// 
@@ -310,10 +305,8 @@ NTSTATUS CkTryFindPatternInModuleExecutableSections(CONST PVOID InBaseAddress, C
 	// Enumerate the sections of the module.
 	// 
 
-	Status = RtlEnumerateModuleSections<SCAN_CONTEXT*>(InBaseAddress, &ScanContext, [] (ULONG InIndex, IMAGE_SECTION_HEADER* InSectionHeader, SCAN_CONTEXT* InContext) -> bool
+	RtlEnumerateModuleSections<SCAN_CONTEXT*>(InBaseAddress, &ScanContext, [] (ULONG InIndex, IMAGE_SECTION_HEADER* InSectionHeader, SCAN_CONTEXT* InContext) -> bool
 	{
-		DbgPrintEx(0, 0, "Parsing section #%lu named '%s' located at 0x%p + 0x%lX.\n", InIndex, &InSectionHeader->Name[0], InContext->BaseAddress, InSectionHeader->VirtualAddress);
-		
 		// 
 		// Parse the section's characteristics.
 		// 
@@ -351,16 +344,9 @@ NTSTATUS CkTryFindPatternInModuleExecutableSections(CONST PVOID InBaseAddress, C
 		// Scan this section.
 		// 
 
-		DbgPrintEx(0, 0, "  - Scanning...\n");
 		return NT_SUCCESS(CkTryFindPattern(SectionData, InSectionHeader->Misc.VirtualSize, InContext->Signature, &InContext->Result));
 	});
 
-	// 
-	// Check if we even scanned any sections...
-	// 
-
-	DbgPrintEx(0, 0, "Result of the enumeration of the section headers of a module located at 0x%p : 0x%lX.\n", InBaseAddress, Status);
-	
 	// 
 	// Return the resulting address.
 	// 
