@@ -60,9 +60,9 @@ NTSTATUS CkTryFindPattern(CONST PVOID InBaseAddress, SIZE_T InSize, CONST CHAR* 
 				Entry->IsWildcard = TRUE;
 
 				if (InSignature[SignatureStep + 1] == '?')
-					SignatureStep += sizeof(char) * 2;
+					SignatureStep += 2;
 				else
-					SignatureStep += sizeof(char) * 1;
+					SignatureStep += 1;
 
 				break;
 			}
@@ -73,7 +73,7 @@ NTSTATUS CkTryFindPattern(CONST PVOID InBaseAddress, SIZE_T InSize, CONST CHAR* 
 				Entry->Value = RtlHexadecimalStringToByte(&InSignature[SignatureStep]);
 				Entry->IsWildcard = FALSE;
 
-				SignatureStep += sizeof(char) * 2;
+				SignatureStep += 2;
 				break;
 			}
 		}
@@ -123,8 +123,6 @@ NTSTATUS CkTryFindPattern(CONST PVOID InBaseAddress, SIZE_T InSize, CONST CHAR* 
 
 				return STATUS_SUCCESS;
 			}
-
-			break;
 		}
 	}
 
@@ -277,12 +275,10 @@ NTSTATUS CkTryFindPatternInModuleExecutableSections(CONST PVOID InBaseAddress, C
 {
 	NTSTATUS Status;
 
-	#ifdef _DEBUG
 	DbgPrintEx(0, 0, "CkTryFindPatternInModuleExecutableSections(...)\n");
 	DbgPrintEx(0, 0, "  - InBaseAddress: 0x%p\n", InBaseAddress);
 	DbgPrintEx(0, 0, "  - InSignature: %s\n", InSignature);
 	DbgPrintEx(0, 0, "  - OutResult: 0x%p\n", OutResult);
-	#endif
 	
 	// 
 	// Verify the passed parameters.
@@ -316,9 +312,7 @@ NTSTATUS CkTryFindPatternInModuleExecutableSections(CONST PVOID InBaseAddress, C
 
 	Status = RtlEnumerateModuleSections<SCAN_CONTEXT*>(InBaseAddress, &ScanContext, [] (ULONG InIndex, IMAGE_SECTION_HEADER* InSectionHeader, SCAN_CONTEXT* InContext) -> bool
 	{
-		#ifdef _DEBUG
 		DbgPrintEx(0, 0, "Parsing section #%lu named '%s' located at 0x%p + 0x%lX.\n", InIndex, &InSectionHeader->Name[0], InContext->BaseAddress, InSectionHeader->VirtualAddress);
-		#endif
 		
 		// 
 		// Parse the section's characteristics.
@@ -357,9 +351,7 @@ NTSTATUS CkTryFindPatternInModuleExecutableSections(CONST PVOID InBaseAddress, C
 		// Scan this section.
 		// 
 
-		#ifdef _DEBUG
 		DbgPrintEx(0, 0, "  - Scanning...\n");
-		#endif
 		return NT_SUCCESS(CkTryFindPattern(SectionData, InSectionHeader->Misc.VirtualSize, InContext->Signature, &InContext->Result));
 	});
 
@@ -367,12 +359,7 @@ NTSTATUS CkTryFindPatternInModuleExecutableSections(CONST PVOID InBaseAddress, C
 	// Check if we even scanned any sections...
 	// 
 
-	if (NT_ERROR(Status))
-	{
-		#ifdef _DEBUG
-		DbgPrintEx(0, 0, "Failed to enumerate the section headers of a module located at 0x%p, reason: 0x%lX.", InBaseAddress, Status);
-		#endif
-	}
+	DbgPrintEx(0, 0, "Result of the enumeration of the section headers of a module located at 0x%p : 0x%lX.\n", InBaseAddress, Status);
 	
 	// 
 	// Return the resulting address.
