@@ -275,6 +275,15 @@ NTSTATUS CkTryFindPaddingFromEnd(CONST PVOID InBaseAddress, SIZE_T InSize, UINT8
 /// <param name="OutResult">The signature scan result.</param>
 NTSTATUS CkTryFindPatternInModuleExecutableSections(CONST PVOID InBaseAddress, CONST CHAR* InSignature, OPTIONAL OUT PVOID* OutResult)
 {
+	NTSTATUS Status;
+
+	#ifdef _DEBUG
+	DbgPrintEx(0, 0, "CkTryFindPatternInModuleExecutableSections(...)\n");
+	DbgPrintEx(0, 0, "  - InBaseAddress: 0x%p\n", InBaseAddress);
+	DbgPrintEx(0, 0, "  - InSignature: %s\n", InSignature);
+	DbgPrintEx(0, 0, "  - OutResult: 0x%p\n", OutResult);
+	#endif
+	
 	// 
 	// Verify the passed parameters.
 	// 
@@ -299,14 +308,18 @@ NTSTATUS CkTryFindPatternInModuleExecutableSections(CONST PVOID InBaseAddress, C
 	SCAN_CONTEXT ScanContext;
 	ScanContext.BaseAddress = InBaseAddress;
 	ScanContext.Signature = InSignature;
-	ScanContext.Result = NULL;
+	ScanContext.Result = nullptr;
 
 	// 
 	// Enumerate the sections of the module.
 	// 
 
-	RtlEnumerateModuleSections<SCAN_CONTEXT*>(InBaseAddress, &ScanContext, [] (ULONG InIndex, IMAGE_SECTION_HEADER* InSectionHeader, SCAN_CONTEXT* InContext) -> bool
+	Status = RtlEnumerateModuleSections<SCAN_CONTEXT*>(InBaseAddress, &ScanContext, [] (ULONG InIndex, IMAGE_SECTION_HEADER* InSectionHeader, SCAN_CONTEXT* InContext) -> bool
 	{
+		#ifdef _DEBUG
+		DbgPrintEx(0, 0, "Parsing section #%lu named '%s' located at 0x%p + 0x%lX.\n", InIndex, &InSectionHeader->Name[0], InContext->BaseAddress, InSectionHeader->VirtualAddress);
+		#endif
+		
 		// 
 		// Parse the section's characteristics.
 		// 
@@ -344,9 +357,23 @@ NTSTATUS CkTryFindPatternInModuleExecutableSections(CONST PVOID InBaseAddress, C
 		// Scan this section.
 		// 
 
+		#ifdef _DEBUG
+		DbgPrintEx(0, 0, "  - Scanning...\n");
+		#endif
 		return NT_SUCCESS(CkTryFindPattern(SectionData, InSectionHeader->Misc.VirtualSize, InContext->Signature, &InContext->Result));
 	});
 
+	// 
+	// Check if we even scanned any sections...
+	// 
+
+	if (NT_ERROR(Status))
+	{
+		#ifdef _DEBUG
+		DbgPrintEx(0, 0, "Failed to enumerate the section headers of a module located at 0x%p, reason: 0x%lX.", InBaseAddress, Status);
+		#endif
+	}
+	
 	// 
 	// Return the resulting address.
 	// 

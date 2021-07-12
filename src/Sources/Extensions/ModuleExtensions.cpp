@@ -15,19 +15,13 @@ NTSTATUS PsGetProcessModules(CONST PEPROCESS InProcess, OUT RTL_PROCESS_MODULE_I
 	// 
 
 	if (InProcess == nullptr)
-	{
 		return STATUS_INVALID_PARAMETER_1;
-	}
 
 	if (OutModuleEntries == nullptr)
-	{
 		return STATUS_INVALID_PARAMETER_2;
-	}
 
 	if (OutNumberOfModules == nullptr)
-	{
 		return STATUS_INVALID_PARAMETER_3;
-	}
 
 	// 
 	// The system process uses a different list.
@@ -232,26 +226,20 @@ NTSTATUS PsGetProcessModuleInformation(CONST PEPROCESS InProcess, CONST CHAR* In
 	// 
 
 	if (InProcess == nullptr)
-	{
 		return STATUS_INVALID_PARAMETER_1;
-	}
 
 	if (InModuleFilename == nullptr)
-	{
 		return STATUS_INVALID_PARAMETER_2;
-	}
 
 	// 
 	// Retrieve the modules loaded in the target process.
 	// 
 
-	RTL_PROCESS_MODULE_INFORMATION* Modules = NULL;
+	RTL_PROCESS_MODULE_INFORMATION* Modules = nullptr;
 	ULONG ModulesCount = 0;
 
 	if (!NT_SUCCESS(Status = PsGetProcessModules(InProcess, &Modules, &ModulesCount)))
-	{
 		return Status;
-	}
 
 	// 
 	// Search for a module at the given address.
@@ -304,14 +292,10 @@ NTSTATUS PsGetProcessModuleInformation(CONST PEPROCESS InProcess, CONST WCHAR* I
 	// 
 
 	if (InProcess == nullptr)
-	{
 		return STATUS_INVALID_PARAMETER_1;
-	}
 
 	if (InModuleFilename == nullptr)
-	{
 		return STATUS_INVALID_PARAMETER_2;
-	}
 
 	// 
 	// Convert the UNICODE string to ANSI.
@@ -346,26 +330,20 @@ NTSTATUS PsGetProcessModuleInformationByAddress(CONST PEPROCESS InProcess, CONST
 	// 
 
 	if (InProcess == nullptr)
-	{
 		return STATUS_INVALID_PARAMETER_1;
-	}
 
 	if (InModuleAddress == nullptr)
-	{
 		return STATUS_INVALID_PARAMETER_2;
-	}
 
 	// 
 	// Retrieve the modules loaded in the target process.
 	// 
 
-	RTL_PROCESS_MODULE_INFORMATION* Modules = NULL;
+	RTL_PROCESS_MODULE_INFORMATION* Modules = nullptr;
 	ULONG ModulesCount = 0;
 
 	if (!NT_SUCCESS(Status = PsGetProcessModules(InProcess, &Modules, &ModulesCount)))
-	{
 		return Status;
-	}
 
 	// 
 	// Search for a module at the given address.
@@ -457,7 +435,7 @@ PIMAGE_NT_HEADERS RtlModuleNtHeaders(CONST PVOID InBaseAddress)
 
 	auto* NtHeaders = (PIMAGE_NT_HEADERS) RtlAddOffsetToPointer(InBaseAddress, DosHeader->e_lfanew);
 
-	if (DosHeader->e_lfanew == 0 || NtHeaders->Signature != IMAGE_NT_SIGNATURE)
+	if (DosHeader->e_lfanew == 0 /* || NtHeaders->Signature != IMAGE_NT_SIGNATURE */ )
 		return nullptr;
 
 	return NtHeaders;
