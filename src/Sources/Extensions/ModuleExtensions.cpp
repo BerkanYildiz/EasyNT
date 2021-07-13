@@ -644,7 +644,7 @@ NTSTATUS RtlModuleFindExport(CONST PEPROCESS InProcess, CONST PVOID InBaseAddres
 			auto  const ForwardNameLength = RtlStringLength(ForwardName);
 			auto* const SplitPoint = strchr(ForwardName, '.');
 			auto* const FunctionName = SplitPoint + 1;
-			auto  const ModuleNameLength = (SIZE_T) RtlSubOffsetFromPointer(SplitPoint, ForwardName) - 1;
+			auto  const ModuleNameLength = (SIZE_T) RtlSubOffsetFromPointer(SplitPoint, ForwardName);
 			auto  const FunctionNameLength = RtlStringLength(FunctionName);
 
 			// 
@@ -691,6 +691,7 @@ NTSTATUS RtlModuleFindExport(CONST PEPROCESS InProcess, CONST PVOID InBaseAddres
 						HasFoundFunction = TRUE;
 						FunctionAddress = ForwardedFunctionAddress;
 						CkFreePool(ModuleName);
+						ModuleName = nullptr;
 						break;
 					}
 				}
@@ -700,6 +701,8 @@ NTSTATUS RtlModuleFindExport(CONST PEPROCESS InProcess, CONST PVOID InBaseAddres
 			// This was the function we were looking for, exit...
 			// 
 
+			if (ModuleName != nullptr)
+				CkFreePool(ModuleName);
 			break;
 		}
 	}
