@@ -13,7 +13,6 @@
 
 #include <ntdef.h>
 #include <ntifs.h>
-#include <tchar.h>
 #include <wdm.h>
 #include <ntstrsafe.h>
 #include <intrin.h>
