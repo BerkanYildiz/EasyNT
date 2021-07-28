@@ -63,6 +63,10 @@ EXTERN_C NTSTATUS NTAPI PsReleaseProcessExitSynchronization(
 	IN CONST PEPROCESS Process
 );
 
+EXTERN_C NTKERNELAPI PVOID PsGetProcessSectionBaseAddress(
+	IN CONST PEPROCESS Process
+);
+
 // 
 // Non-documented or exported defines for executables formats.
 // 
