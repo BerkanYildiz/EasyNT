@@ -433,7 +433,7 @@ WCHAR* RtlFindString(CONST WCHAR* InString, CONST WCHAR* InSearchedString, BOOLE
 /// <param name="InString">The string.</param>
 /// <param name="InSearchedString">The string to find.</param>
 /// <param name="InCaseInsensitive">Whether to check the casing of every characters or not.</param>
-BOOLEAN RtlContainsString(CONST CHAR* InString, CONST CHAR* InSearchedString, BOOLEAN InCaseInsensitive)
+BOOLEAN RtlStringContains(CONST CHAR* InString, CONST CHAR* InSearchedString, BOOLEAN InCaseInsensitive)
 {
 	return RtlFindString(InString, InSearchedString, InCaseInsensitive) != nullptr;
 }
@@ -444,7 +444,7 @@ BOOLEAN RtlContainsString(CONST CHAR* InString, CONST CHAR* InSearchedString, BO
 /// <param name="InString">The string.</param>
 /// <param name="InSearchedString">The string to find.</param>
 /// <param name="InCaseInsensitive">Whether to check the casing of every characters or not.</param>
-BOOLEAN RtlContainsString(CONST WCHAR* InString, CONST WCHAR* InSearchedString, BOOLEAN InCaseInsensitive)
+BOOLEAN RtlStringContains(CONST WCHAR* InString, CONST WCHAR* InSearchedString, BOOLEAN InCaseInsensitive)
 {
 	return RtlFindString(InString, InSearchedString, InCaseInsensitive) != nullptr;
 }

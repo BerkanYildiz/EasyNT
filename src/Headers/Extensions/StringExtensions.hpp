@@ -157,6 +157,22 @@ CHAR* RtlFindString(CONST CHAR* InString, CONST CHAR* InSearchedString, BOOLEAN 
 WCHAR* RtlFindString(CONST WCHAR* InString, CONST WCHAR* InSearchedString, BOOLEAN InCaseInsensitive = FALSE);
 
 /// <summary>
+/// Returns a value indicating whether a string contains a substring.
+/// </summary>
+/// <param name="InString">The string.</param>
+/// <param name="InSearchedString">The string to find.</param>
+/// <param name="InCaseInsensitive">Whether to check the casing of every characters or not.</param>
+BOOLEAN RtlStringContains(CONST CHAR* InString, CONST CHAR* InSearchedString, BOOLEAN InCaseInsensitive = FALSE);
+
+/// <summary>
+/// Returns a value indicating whether a string contains a substring.
+/// </summary>
+/// <param name="InString">The string.</param>
+/// <param name="InSearchedString">The string to find.</param>
+/// <param name="InCaseInsensitive">Whether to check the casing of every characters or not.</param>
+BOOLEAN RtlStringContains(CONST WCHAR* InString, CONST WCHAR* InSearchedString, BOOLEAN InCaseInsensitive = FALSE);
+
+/// <summary>
 /// Returns a value indicating whether the string starts with the substring.
 /// </summary>
 /// <param name="InString">The string.</param>
