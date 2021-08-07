@@ -16,9 +16,9 @@ enum class ECharsetFormat : int
 	// Modifiers.
 	// 
 	
-	AlphaNumerical	= Alphabet | Numerical,
-	OnlyUppercase	= 0x00000008,
-	OnlyLowercase	= 0x00000010,
+	AlphaNumerical	= 0x00000020,
+	OnlyUppercase	= 0x10000008,
+	OnlyLowercase	= 0x20000000,
 };
 
 DEFINE_ENUM_FLAG_OPERATORS(ECharsetFormat);
