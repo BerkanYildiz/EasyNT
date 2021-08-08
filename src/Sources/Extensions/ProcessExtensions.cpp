@@ -639,7 +639,7 @@ NTSTATUS PsGetProcessImageFileName(CONST PEPROCESS InProcess, OUT WCHAR** OutPro
 	// Format the path to only get the actual filename with its extension.
 	// 
 	
-	CONST WCHAR* FileName = wcschr(FullProcessFilePath, OBJ_NAME_PATH_SEPARATOR);
+	CONST WCHAR* FileName = wcsrchr(FullProcessFilePath, OBJ_NAME_PATH_SEPARATOR);
 
 	if (FileName != nullptr)
 	{
