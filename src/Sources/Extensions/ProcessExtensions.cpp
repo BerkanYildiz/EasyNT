@@ -203,7 +203,7 @@ NTSTATUS PsGetProcesses(UNICODE_STRING InProcessName, OUT SYSTEM_PROCESS_INFORMA
 		// 
 
 		if (ProcessEntry->NextEntryOffset == 0 ||
-			MatchingProcessEntry->NextEntryOffset == 0)
+			CurrentMatchingProcessIndex >= NumberOfMatchingProcessEntries)
 		{
 			break;
 		}
