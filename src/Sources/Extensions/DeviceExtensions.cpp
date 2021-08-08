@@ -157,10 +157,7 @@ DEVICE_OBJECT* IoGetPhysicalDeviceObject(DEVICE_OBJECT* InDeviceObject)
 	};
 
 	ENUMERATION_CONTEXT EnumerationContext;
-	EnumerationContext.ReturnedDevice = InDeviceObject->Flags & DO_BUS_ENUMERATED_DEVICE ? InDeviceObject : nullptr;
-	
-	if (EnumerationContext.ReturnedDevice != nullptr)
-		ObfReferenceObject(EnumerationContext.ReturnedDevice);
+	EnumerationContext.ReturnedDevice = nullptr;
 
 	// 
 	// Enumerate each device objects in the stack.
@@ -215,10 +212,7 @@ DEVICE_OBJECT* IoGetLowestDeviceObjectOfType(DEVICE_OBJECT* InDeviceObject, ULON
 
 	ENUMERATION_CONTEXT EnumerationContext;
 	EnumerationContext.DeviceType = InDeviceType;
-	EnumerationContext.ReturnedDevice = InDeviceObject->DeviceType == InDeviceType ? InDeviceObject : nullptr;
-
-	if (EnumerationContext.ReturnedDevice != nullptr)
-		ObfReferenceObject(EnumerationContext.ReturnedDevice);
+	EnumerationContext.ReturnedDevice = nullptr;
 
 	// 
 	// Enumerate each device in the stack.
@@ -283,10 +277,7 @@ DEVICE_OBJECT* IoGetLowestDeviceObjectOwnedByDriver(DEVICE_OBJECT* InDeviceObjec
 
 	ENUMERATION_CONTEXT EnumerationContext;
 	EnumerationContext.DriverObject = InOwningDriver;
-	EnumerationContext.ReturnedDevice = InDeviceObject->DriverObject == InOwningDriver ? InDeviceObject : nullptr;
-
-	if (EnumerationContext.ReturnedDevice != nullptr)
-		ObfReferenceObject(EnumerationContext.ReturnedDevice);
+	EnumerationContext.ReturnedDevice = nullptr;
 
 	// 
 	// Enumerate each device in the stack.

@@ -60,7 +60,7 @@ NTSTATUS IoEnumerateDevicesByInterface(GUID InInterfaceGuid, PVOID InContext, EN
 		// 
 
 		DEVICE_OBJECT* DeviceObject;
-		Status = IoGetDeviceObject(SymbolicList, GENERIC_ALL, &DeviceObject);
+		Status = IoGetDeviceObject(SymbolicList, SYNCHRONIZE, &DeviceObject);
 
 		if (NT_SUCCESS(Status))
 		{
