@@ -144,10 +144,8 @@ DEVICE_OBJECT* IoGetPhysicalDeviceObject(DEVICE_OBJECT* InDeviceObject)
 	// Verify the passed parameters.
 	// 
 
-	if (InDeviceObject == NULL)
-	{
-		return NULL;
-	}
+	if (InDeviceObject == nullptr)
+		return nullptr;
 
 	// 
 	// Setup the enumeration context.
@@ -159,7 +157,10 @@ DEVICE_OBJECT* IoGetPhysicalDeviceObject(DEVICE_OBJECT* InDeviceObject)
 	};
 
 	ENUMERATION_CONTEXT EnumerationContext;
-	EnumerationContext.ReturnedDevice = NULL;
+	EnumerationContext.ReturnedDevice = InDeviceObject->Flags & DO_BUS_ENUMERATED_DEVICE ? InDeviceObject : nullptr;
+	
+	if (EnumerationContext.ReturnedDevice != nullptr)
+		ObfReferenceObject(EnumerationContext.ReturnedDevice);
 
 	// 
 	// Enumerate each device objects in the stack.
@@ -183,7 +184,6 @@ DEVICE_OBJECT* IoGetPhysicalDeviceObject(DEVICE_OBJECT* InDeviceObject)
 		}
 
 		return false;
-
 	});
 
 	return EnumerationContext.ReturnedDevice;
@@ -200,10 +200,8 @@ DEVICE_OBJECT* IoGetLowestDeviceObjectOfType(DEVICE_OBJECT* InDeviceObject, ULON
 	// Verify the passed parameters.
 	// 
 
-	if (InDeviceObject == NULL)
-	{
-		return NULL;
-	}
+	if (InDeviceObject == nullptr)
+		return nullptr;
 
 	// 
 	// Setup the enumeration context.
@@ -217,7 +215,10 @@ DEVICE_OBJECT* IoGetLowestDeviceObjectOfType(DEVICE_OBJECT* InDeviceObject, ULON
 
 	ENUMERATION_CONTEXT EnumerationContext;
 	EnumerationContext.DeviceType = InDeviceType;
-	EnumerationContext.ReturnedDevice = NULL;
+	EnumerationContext.ReturnedDevice = InDeviceObject->DeviceType == InDeviceType ? InDeviceObject : nullptr;
+
+	if (EnumerationContext.ReturnedDevice != nullptr)
+		ObfReferenceObject(EnumerationContext.ReturnedDevice);
 
 	// 
 	// Enumerate each device in the stack.
@@ -248,7 +249,6 @@ DEVICE_OBJECT* IoGetLowestDeviceObjectOfType(DEVICE_OBJECT* InDeviceObject, ULON
 		}
 
 		return false;
-
 	});
 
 	return EnumerationContext.ReturnedDevice;
@@ -265,15 +265,11 @@ DEVICE_OBJECT* IoGetLowestDeviceObjectOwnedByDriver(DEVICE_OBJECT* InDeviceObjec
 	// Verify the passed parameters.
 	// 
 
-	if (InDeviceObject == NULL)
-	{
-		return NULL;
-	}
+	if (InDeviceObject == nullptr)
+		return nullptr;
 	
-	if (InOwningDriver == NULL)
-	{
-		return NULL;
-	}
+	if (InOwningDriver == nullptr)
+		return nullptr;
 
 	// 
 	// Setup the enumeration context.
@@ -287,7 +283,10 @@ DEVICE_OBJECT* IoGetLowestDeviceObjectOwnedByDriver(DEVICE_OBJECT* InDeviceObjec
 
 	ENUMERATION_CONTEXT EnumerationContext;
 	EnumerationContext.DriverObject = InOwningDriver;
-	EnumerationContext.ReturnedDevice = NULL;
+	EnumerationContext.ReturnedDevice = InDeviceObject->DriverObject == InOwningDriver ? InDeviceObject : nullptr;
+
+	if (EnumerationContext.ReturnedDevice != nullptr)
+		ObfReferenceObject(EnumerationContext.ReturnedDevice);
 
 	// 
 	// Enumerate each device in the stack.
@@ -318,7 +317,6 @@ DEVICE_OBJECT* IoGetLowestDeviceObjectOwnedByDriver(DEVICE_OBJECT* InDeviceObjec
 		}
 
 		return false;
-
 	});
 
 	return EnumerationContext.ReturnedDevice;
@@ -336,20 +334,14 @@ NTSTATUS IoEnumerateDeviceStack(DEVICE_OBJECT* InDeviceObject, VOID* InContext, 
 	// Verify the passed parameters.
 	// 
 
-	if (InDeviceObject == NULL)
-	{
+	if (InDeviceObject == nullptr)
 		return STATUS_INVALID_PARAMETER_1;
-	}
 
-	if (InContext == NULL)
-	{
+	if (InContext == nullptr)
 		return STATUS_INVALID_PARAMETER_2;
-	}
 
-	if (InCallback == NULL)
-	{
+	if (InCallback == nullptr)
 		return STATUS_INVALID_PARAMETER_3;
-	}
 
 	// 
 	// Retrieve the highest level device in the stack.
@@ -363,7 +355,7 @@ NTSTATUS IoEnumerateDeviceStack(DEVICE_OBJECT* InDeviceObject, VOID* InContext, 
 
 	ULONG Idx = 0;
 
-	for (auto* CurrentDevice = (DEVICE_OBJECT*) HighestDevice; CurrentDevice != NULL; CurrentDevice = IoGetLowerDeviceObject(CurrentDevice))
+	for (auto* CurrentDevice = (DEVICE_OBJECT*) HighestDevice; CurrentDevice != nullptr; CurrentDevice = IoGetLowerDeviceObject(CurrentDevice))
 	{
 		// 
 		// Execute the callback.
