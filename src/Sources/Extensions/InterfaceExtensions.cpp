@@ -80,7 +80,7 @@ NTSTATUS IoEnumerateDevicesByInterface(GUID InInterfaceGuid, PVOID InContext, EN
 		// Move onto the next entry.
 		// 
 
-		CurrentSymbolicLink = (WCHAR*) RtlAddOffsetToPointer(CurrentSymbolicLink, SymbolicName.Length);
+		CurrentSymbolicLink = (WCHAR*) RtlAddOffsetToPointer(CurrentSymbolicLink, SymbolicName.MaximumLength);
 	}
 
 	// 
