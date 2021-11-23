@@ -85,6 +85,8 @@ EXTERN_C NTKERNELAPI PVOID PsGetProcessSectionBaseAddress(
 #define IMAGE_FILE_MACHINE_I386				 0x014c
 #define IMAGE_FILE_MACHINE_AMD64			 0x8664
 
+#define IMAGE_DLLCHARACTERISTICS_GUARD_CF 0x4000
+
 #define IMAGE_DIRECTORY_ENTRY_EXPORT          0   // Export Directory
 #define IMAGE_DIRECTORY_ENTRY_IMPORT          1   // Import Directory
 #define IMAGE_DIRECTORY_ENTRY_RESOURCE        2   // Resource Directory
