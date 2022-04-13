@@ -1,6 +1,17 @@
 #include "../../Headers/EasyNT.h"
 
 /// <summary>
+/// Generates a random bytes array of the given length.
+/// </summary>
+void RtlRandomBytes(void* OutBuffer, SIZE_T InNumberOfBytes)
+{
+	auto* Buffer = (UINT8*) OutBuffer;
+
+	for (SIZE_T I = 0; I < InNumberOfBytes; I++)
+		Buffer[I] = RtlRandomByte();
+}
+
+/// <summary>
 /// Generates a random byte value from 0x00 to a given number excluded.
 /// </summary>
 /// <param name="MaxValueExcluded">The maximum value (excluded) to be returned.</param>

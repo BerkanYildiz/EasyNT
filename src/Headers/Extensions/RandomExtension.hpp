@@ -24,6 +24,11 @@ enum class ECharsetFormat : int
 DEFINE_ENUM_FLAG_OPERATORS(ECharsetFormat);
 
 /// <summary>
+/// Generates a random bytes array of the given length.
+/// </summary>
+void RtlRandomBytes(void* OutBuffer, SIZE_T InNumberOfBytes);
+
+/// <summary>
 /// Generates a random byte value from 0x00 to a given number excluded.
 /// </summary>
 /// <param name="MaxValueExcluded">The maximum value (excluded) to be returned.</param>
