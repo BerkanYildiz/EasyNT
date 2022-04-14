@@ -67,6 +67,11 @@ UINT32 RtlRandomInteger();
 BOOLEAN RtlRandomBoolean();
 
 /// <summary>
+/// Generates a random UUID.
+/// </summary>
+void RtlRandomUuid(OUT UUID* OutUuid);
+
+/// <summary>
 /// Generates a random character from the given string.
 /// </summary>
 /// <param name="InValidCharacters">The charset to select characters from.</param>
