@@ -37,7 +37,7 @@ void CkArrayForEach(TEntry* InArray, SIZE_T InNumberOfElements, TContext InConte
 /// <param name="InArray">The array.</param>
 /// <param name="InNumberOfElements">The number of elements in the array.</param>
 /// <param name="InCallback">The comparer.</param>
-///	<returns>True if array is not empty and every entries match the condition, false otherwise.</returns>
+/// <returns>True if array is not empty and every entries match the condition, false otherwise.</returns>
 template <typename TEntry>
 BOOLEAN CkArrayMatchAll(CONST TEntry* InArray, SIZE_T InNumberOfElements, bool(*InCallback)(TEntry))
 {
@@ -57,7 +57,7 @@ BOOLEAN CkArrayMatchAll(CONST TEntry* InArray, SIZE_T InNumberOfElements, bool(*
 /// <param name="InContext">The number of elements in the array.</param>
 /// <param name="InNumberOfElements">The context.</param>
 /// <param name="InCallback">The comparer.</param>
-///	<returns>True if array is not empty and every entries match the condition, false otherwise.</returns>
+/// <returns>True if array is not empty and every entries match the condition, false otherwise.</returns>
 template <typename TEntry, typename TContext>
 BOOLEAN CkArrayMatchAll(CONST TEntry* InArray, SIZE_T InNumberOfElements, TContext InContext, bool(*InCallback)(TEntry, TContext))
 {
@@ -75,7 +75,7 @@ BOOLEAN CkArrayMatchAll(CONST TEntry* InArray, SIZE_T InNumberOfElements, TConte
 /// <param name="InArray">The array.</param>
 /// <param name="InNumberOfElements">The number of elements in the array.</param>
 /// <param name="InComparedValue">The compared value.</param>
-///	<returns>True if array is not empty and every entries match the condition, false otherwise.</returns>
+/// <returns>True if array is not empty and every entries match the condition, false otherwise.</returns>
 template <typename TEntry>
 BOOLEAN CkArrayMatchAll(CONST TEntry* InArray, SIZE_T InNumberOfElements, CONST TEntry InComparedValue)
 {
@@ -93,7 +93,7 @@ BOOLEAN CkArrayMatchAll(CONST TEntry* InArray, SIZE_T InNumberOfElements, CONST 
 /// <param name="InArray">The array.</param>
 /// <param name="InNumberOfElements">The number of elements in the array.</param>
 /// <param name="InCallback">The comparer.</param>
-///	<returns>True if array is not empty and at least 1 entry match the condition, false otherwise.</returns>
+/// <returns>True if array is not empty and at least 1 entry match the condition, false otherwise.</returns>
 template <typename TEntry>
 BOOLEAN CkArrayMatchAny(CONST TEntry* InArray, SIZE_T InNumberOfElements, bool(*InCallback)(TEntry))
 {
@@ -113,7 +113,7 @@ BOOLEAN CkArrayMatchAny(CONST TEntry* InArray, SIZE_T InNumberOfElements, bool(*
 /// <param name="InNumberOfElements">The number of elements in the array.</param>
 /// <param name="InContext">The number of elements in the array.</param>
 /// <param name="InCallback">The comparer.</param>
-///	<returns>True if array is not empty and at least 1 entry match the condition, false otherwise.</returns>
+/// <returns>True if array is not empty and at least 1 entry match the condition, false otherwise.</returns>
 template <typename TEntry, typename TContext>
 BOOLEAN CkArrayMatchAny(CONST TEntry* InArray, SIZE_T InNumberOfElements, TContext InContext, bool(*InCallback)(TEntry, TContext))
 {
@@ -131,7 +131,7 @@ BOOLEAN CkArrayMatchAny(CONST TEntry* InArray, SIZE_T InNumberOfElements, TConte
 /// <param name="InArray">The array.</param>
 /// <param name="InNumberOfElements">The number of elements in the array.</param>
 /// <param name="InComparedValue">The compared value.</param>
-///	<returns>True if array is not empty and at least 1 entry match the condition, false otherwise.</returns>
+/// <returns>True if array is not empty and at least 1 entry match the condition, false otherwise.</returns>
 template <typename TEntry>
 BOOLEAN CkArrayMatchAny(CONST TEntry* InArray, SIZE_T InNumberOfElements, CONST TEntry InComparedValue)
 {
