@@ -60,7 +60,7 @@ NTSTATUS IoEnumerateDevicesByInterface(GUID InInterfaceGuid, PVOID InContext, EN
 		// 
 
 		DEVICE_OBJECT* DeviceObject;
-		Status = IoGetDeviceObject(SymbolicName, SYNCHRONIZE, &DeviceObject);
+		Status = CkGetDeviceObject(SymbolicName, SYNCHRONIZE, &DeviceObject);
 
 		if (NT_SUCCESS(Status))
 		{

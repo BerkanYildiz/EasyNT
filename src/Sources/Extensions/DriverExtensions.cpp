@@ -1,124 +1,81 @@
 #include "../../Headers/EasyNT.h"
 
-/// <summary>
-/// Gets a driver object by its IO filename.
-/// </summary>
-/// <param name="InDriverName">The name of the driver.</param>
-/// <param name="OutDriverObject">The returned driver object.</param>
-NTSTATUS IoGetDriverObject(UNICODE_STRING InDriverName, PDRIVER_OBJECT* OutDriverObject)
-{
-	NTSTATUS Status;
-	DRIVER_OBJECT* DriverObject;
-
-	if (NT_ERROR(Status = ObReferenceObjectByName(&InDriverName, OBJ_CASE_INSENSITIVE, NULL, 0, *IoDriverObjectType, KernelMode, NULL, (PVOID*) &DriverObject)))
-		return Status;
-
-	*OutDriverObject = DriverObject;
-	return STATUS_SUCCESS;
-}
+// 
+// Driver Objects.
+// 
 
 /// <summary>
 /// Gets a driver object by its IO filename.
 /// </summary>
 /// <param name="InDriverName">The name of the driver.</param>
 /// <param name="OutDriverObject">The returned driver object.</param>
-NTSTATUS IoGetDriverObject(CONST WCHAR* InDriverName, PDRIVER_OBJECT* OutDriverObject)
+/// <remarks>The object's reference count is incremented.</remarks>
+NTSTATUS CkGetDriverObject(ANSI_STRING InDriverName, OPTIONAL OUT PDRIVER_OBJECT* OutDriverObject)
 {
-	if (InDriverName == nullptr)
-		return STATUS_INVALID_PARAMETER_1;
-	
 	UNICODE_STRING DriverName;
-	RtlInitUnicodeString(&DriverName, InDriverName);
-	return IoGetDriverObject(DriverName, OutDriverObject);
-}
-
-/// <summary>
-/// Gets a driver object by its IO filename.
-/// </summary>
-/// <param name="InDriverName">The name of the driver.</param>
-/// <param name="OutDriverObject">The returned driver object.</param>
-NTSTATUS IoGetDriverObject(CONST CHAR* InDriverName, PDRIVER_OBJECT* OutDriverObject)
-{
-	if (InDriverName == nullptr)
-		return STATUS_INVALID_PARAMETER_1;
-	
-	ANSI_STRING DriverNameToConvert;
-	RtlInitAnsiString(&DriverNameToConvert, InDriverName);
-
-	UNICODE_STRING DriverName;
-	NTSTATUS Status = RtlAnsiStringToUnicodeString(&DriverName, &DriverNameToConvert, TRUE);
+	NTSTATUS Status = RtlAnsiStringToUnicodeString(&DriverName, &InDriverName, TRUE);
 
 	if (NT_ERROR(Status))
 		return Status;
 	
-	Status = IoGetDriverObject(DriverName, OutDriverObject);
+	Status = CkGetDriverObject(DriverName, OutDriverObject);
 	RtlFreeUnicodeString(&DriverName);
 	return Status;
 }
 
 /// <summary>
-/// Enumerates every devices owned by the given driver.
+/// Gets a driver object by its IO filename.
 /// </summary>
-/// <param name="InDriverObject">The driver object.</param>
-/// <param name="InContext">The context.</param>
-/// <param name="InCallback">The callback.</param>
-NTSTATUS IoEnumerateDevices(CONST DRIVER_OBJECT* InDriverObject, PVOID InContext, ENUMERATE_DRIVER_DEVICES_WITH_CONTEXT InCallback)
+/// <param name="InDriverName">The name of the driver.</param>
+/// <param name="OutDriverObject">The returned driver object.</param>
+/// <remarks>The object's reference count is incremented.</remarks>
+NTSTATUS CkGetDriverObject(UNICODE_STRING InDriverName, OPTIONAL OUT PDRIVER_OBJECT* OutDriverObject)
 {
-	// 
-	// Verify the passed parameters.
-	// 
-
-	if (InDriverObject == nullptr)
-		return STATUS_INVALID_PARAMETER_1;
-
-	if (InContext == nullptr)
-		return STATUS_INVALID_PARAMETER_2;
-
-	if (InCallback == nullptr)
-		return STATUS_INVALID_PARAMETER_3;
-
-	if (InDriverObject->DeviceObject == nullptr)
-		return STATUS_NO_MORE_ENTRIES;
+	NTSTATUS Status;
+	DRIVER_OBJECT* DriverObject;
 
 	// 
-	// Loop through the device objects owned by the driver.
+	// Retrieve the driver object.
 	// 
 
-	auto CurrentDeviceIndex = 0;
-	auto* CurrentDevice = InDriverObject->DeviceObject;
+	if (NT_ERROR(Status = ObReferenceObjectByName(&InDriverName, OBJ_CASE_INSENSITIVE, NULL, 0, *IoDriverObjectType, KernelMode, NULL, (PVOID*) &DriverObject)))
+		return Status;
 
-	while (TRUE)
-	{
-		ObfReferenceObject(CurrentDevice);
-		const auto SkipOtherEntries = InCallback(CurrentDeviceIndex++, CurrentDevice, InContext);
-		ObfDereferenceObject(CurrentDevice);
-		
-		if (SkipOtherEntries)
-			break;
+	// 
+	// Return the result.
+	// 
+	
+	if (OutDriverObject != nullptr)
+		*OutDriverObject = DriverObject;
 
-		// 
-		// Move onto the next entry.
-		// 
-
-		CurrentDevice = CurrentDevice->NextDevice;
-
-		if (CurrentDevice == nullptr)
-			break;
-	}
+	if (OutDriverObject == nullptr && DriverObject != nullptr)
+		ObfDereferenceObject(DriverObject);
 
 	return STATUS_SUCCESS;
 }
 
 /// <summary>
-/// Enumerates every devices owned by the given driver.
+/// Gets a driver object by its IO filename.
 /// </summary>
-/// <param name="InDriverObject">The driver object.</param>
-/// <param name="InCallback">The callback.</param>
-NTSTATUS IoEnumerateDevices(CONST DRIVER_OBJECT* InDriverObject, ENUMERATE_DRIVER_DEVICES InCallback)
+/// <param name="InDriverName">The name of the driver.</param>
+/// <param name="OutDriverObject">The returned driver object.</param>
+/// <remarks>The object's reference count is incremented.</remarks>
+NTSTATUS CkGetDriverObject(CONST CHAR* InDriverName, OPTIONAL OUT PDRIVER_OBJECT* OutDriverObject)
 {
-	return IoEnumerateDevices(InDriverObject, InCallback, [] (ULONG InIndex, DEVICE_OBJECT* InDeviceObject, PVOID InContext) -> bool
-	{
-		auto* Callback = (ENUMERATE_DRIVER_DEVICES) InContext;
-		return Callback(InIndex, InDeviceObject);
-	});
+	ANSI_STRING DriverName;
+	RtlInitAnsiString(&DriverName, InDriverName);
+	return CkGetDriverObject(DriverName, OutDriverObject);
+}
+
+/// <summary>
+/// Gets a driver object by its IO filename.
+/// </summary>
+/// <param name="InDriverName">The name of the driver.</param>
+/// <param name="OutDriverObject">The returned driver object.</param>
+/// <remarks>The object's reference count is incremented.</remarks>
+NTSTATUS CkGetDriverObject(CONST WCHAR* InDriverName, OPTIONAL OUT PDRIVER_OBJECT* OutDriverObject)
+{
+	UNICODE_STRING DriverName;
+	RtlInitUnicodeString(&DriverName, InDriverName);
+	return CkGetDriverObject(DriverName, OutDriverObject);
 }

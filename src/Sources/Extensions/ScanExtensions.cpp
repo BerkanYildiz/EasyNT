@@ -70,7 +70,7 @@ NTSTATUS CkTryFindPattern(CONST PVOID InBaseAddress, SIZE_T InSize, CONST CHAR* 
 			default:
 			{
 				auto* Entry = &SignatureBytes[SignatureLength++];
-				Entry->Value = RtlHexadecimalStringToByte(&InSignature[SignatureStep]);
+				Entry->Value = CkHexadecimalStringToByte(&InSignature[SignatureStep]);
 				Entry->IsWildcard = FALSE;
 
 				SignatureStep += 2;

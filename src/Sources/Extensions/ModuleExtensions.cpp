@@ -160,18 +160,18 @@ NTSTATUS PsGetProcessModules(CONST PEPROCESS InProcess, OUT RTL_PROCESS_MODULE_I
 
 	ULONG CurrentEntryIdx = 0;
 
-	for (auto* ModuleEntry = (PLDR_DATA_TABLE_ENTRY) Peb->Ldr->InLoadOrderModuleList.Flink; ModuleEntry != (PLDR_DATA_TABLE_ENTRY ) &Peb->Ldr->InLoadOrderModuleList && ModuleEntry != nullptr && CurrentEntryIdx < NumberOfEntries; ModuleEntry = (PLDR_DATA_TABLE_ENTRY) ModuleEntry->InLoadOrderLinks.Flink)
+	for (auto* ModuleEntry = (PLDR_DATA_TABLE_ENTRY) Peb->Ldr->InLoadOrderModuleList.Flink; ModuleEntry != (PLDR_DATA_TABLE_ENTRY) &Peb->Ldr->InLoadOrderModuleList && ModuleEntry != nullptr && CurrentEntryIdx < NumberOfEntries; ModuleEntry = (PLDR_DATA_TABLE_ENTRY) ModuleEntry->InLoadOrderLinks.Flink)
 	{
 		// 
 		// Copy the most important fields.
 		// 
 		
-		auto* SavedEntry = &ModuleEntries[CurrentEntryIdx++];
+		auto* SavedEntry = &ModuleEntries[CurrentEntryIdx];
 		SavedEntry->ImageBase = ModuleEntry->DllBase;
 		SavedEntry->MappedBase = ModuleEntry->DllBase;
 		SavedEntry->ImageSize = ModuleEntry->SizeOfImage;
-		SavedEntry->LoadCount = ModuleEntry->LoadCount;
-		SavedEntry->Section = ModuleEntry->SectionPointer;
+		SavedEntry->LoadCount = ModuleEntry->ObsoleteLoadCount;
+		SavedEntry->Section = nullptr;
 		SavedEntry->Flags = ModuleEntry->Flags;
 		SavedEntry->InitOrderIndex = CurrentEntryIdx != 0 ? CurrentEntryIdx - 1 : 0;
 		SavedEntry->LoadOrderIndex = CurrentEntryIdx != 0 ? CurrentEntryIdx - 1 : 0;
@@ -194,6 +194,8 @@ NTSTATUS PsGetProcessModules(CONST PEPROCESS InProcess, OUT RTL_PROCESS_MODULE_I
 			
 			SavedEntry->OffsetToFileName = AnsiPath.Length - (ModuleEntry->BaseDllName.Length / sizeof(WCHAR));
 		}
+
+		++CurrentEntryIdx;
 	}
 
 	// 
