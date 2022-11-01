@@ -115,3 +115,12 @@ void RtlRandomString(CHAR* InBuffer, SIZE_T InNumberOfElements, ECharsetFormat I
 /// Generates a random unicode string using the characters from the given charset.
 /// </summary>
 void RtlRandomString(WCHAR* InBuffer, SIZE_T InNumberOfElements, ECharsetFormat InCharsetFormat);
+
+/// <summary>
+/// Returns a random entry from an array.
+/// </summary>
+template <typename TArray>
+TArray& RtlRandomArray(TArray* InArray, UINT32 InNumberOfEntries)
+{
+	return InArray[RtlRandomInteger(InNumberOfEntries)];
+}

@@ -179,6 +179,60 @@ NTSTATUS CkGetFileObject(CONST WCHAR* InFileName, ACCESS_MASK InDesiredAccess, O
 }
 
 // 
+// Enumerations.
+// 
+
+/// <summary>
+/// Enumerates the device objects present in the given device's stack.
+/// </summary>
+/// <param name="InDeviceObject">The device whose stack will be enumerated.</param>
+/// <param name="InCallback">The function executed on each device in the stack.</param>
+NTSTATUS CkEnumerateDeviceStack(DEVICE_OBJECT* InDeviceObject, bool(*InCallback)(ULONG, DEVICE_OBJECT*))
+{
+	// 
+	// Verify the passed parameters.
+	// 
+
+	if (InDeviceObject == nullptr)
+		return STATUS_INVALID_PARAMETER_1;
+
+	if (InCallback == nullptr)
+		return STATUS_INVALID_PARAMETER_2;
+
+	// 
+	// Retrieve the highest level device in the stack.
+	// 
+
+	auto* HighestDevice = IoGetAttachedDeviceReference(InDeviceObject);
+
+	// 
+	// Loop through the device stack.
+	// 
+
+	ULONG Idx = 0;
+
+	for (auto* CurrentDevice = HighestDevice; CurrentDevice != nullptr; CurrentDevice = IoGetLowerDeviceObject(CurrentDevice))
+	{
+		// 
+		// Execute the callback.
+		// 
+
+		CONST BOOLEAN SkipOtherDevices = InCallback(Idx++, CurrentDevice);
+
+		// 
+		// Dereference the current device.
+		// 
+
+		ObDereferenceObject(CurrentDevice);
+
+		if (SkipOtherDevices)
+			break;
+	}
+	
+	return STATUS_SUCCESS;
+}
+
+// 
 // Relational.
 // 
 

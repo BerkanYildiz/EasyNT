@@ -1,7 +1,8 @@
 #pragma once
 
 typedef bool(* ENUMERATE_VIRTUAL_MEMORY)(ULONG InIndex, MEMORY_BASIC_INFORMATION* InMemoryInformation);
-typedef bool(* ENUMERATE_VIRTUAL_MEMORY_WITH_CONTEXT)(ULONG InIndex, MEMORY_BASIC_INFORMATION* InMemoryInformation, PVOID InContext);
+template <typename TContext>
+using ENUMERATE_VIRTUAL_MEMORY_WITH_CONTEXT = bool(*)(ULONG InIndex, MEMORY_BASIC_INFORMATION* InMemoryInformation, TContext InContext);
 
 /// <summary>
 /// Allocate virtual memory in a given process.
@@ -50,13 +51,17 @@ NTSTATUS CkCopyVirtualMemory(CONST PEPROCESS InSourceProcess, CONST PVOID InSour
 /// <param name="OutNumberOfBytesCopied">The number of bytes copied.</param>
 NTSTATUS CkCopyVirtualMemory(CONST PVOID InSourceAddress, PVOID InDestinationAddress, SIZE_T InNumberOfBytes, OPTIONAL OUT SIZE_T* OutNumberOfBytesCopied = nullptr);
 
+// 
+// Information.
+// 
+
 /// <summary>
 /// Queries information about the memory region located at the given virtual address.
 /// </summary>
 /// <param name="InProcess">The process.</param>
 /// <param name="InVirtualAddress">The virtual address of the region to lookup.</param>
 /// <param name="OutMemoryInformation">The returned memory information.</param>
-NTSTATUS CkQueryVirtualMemory(CONST PEPROCESS InProcess, CONST PVOID InVirtualAddress, OUT MEMORY_BASIC_INFORMATION* OutMemoryInformation);
+NTSTATUS CkQueryVirtualMemory(CONST PEPROCESS InProcess, CONST PVOID InVirtualAddress, OPTIONAL OUT MEMORY_BASIC_INFORMATION* OutMemoryInformation);
 
 /// <summary>
 /// Enumerates the memory regions in the given process and execute a callback for each entries.
@@ -64,8 +69,8 @@ NTSTATUS CkQueryVirtualMemory(CONST PEPROCESS InProcess, CONST PVOID InVirtualAd
 /// <param name="InProcess">The process.</param>
 /// <param name="InContext">The context.</param>
 /// <param name="InCallback">The callback.</param>
-template <typename TContext = PVOID>
-NTSTATUS CkEnumerateVirtualMemory(CONST PEPROCESS InProcess, TContext InContext, bool(*InCallback)(ULONG InIndex, MEMORY_BASIC_INFORMATION* InMemoryInformation, TContext InContext))
+template <typename TContext>
+NTSTATUS CkEnumerateVirtualMemory(CONST PEPROCESS InProcess, TContext InContext, ENUMERATE_VIRTUAL_MEMORY_WITH_CONTEXT<TContext> InCallback)
 {
 	// 
 	// Verify the passed parameters.
@@ -73,9 +78,6 @@ NTSTATUS CkEnumerateVirtualMemory(CONST PEPROCESS InProcess, TContext InContext,
 
 	if (InProcess == nullptr)
 		return STATUS_INVALID_PARAMETER_1;
-
-	if (InContext == nullptr)
-		return STATUS_INVALID_PARAMETER_2;
 
 	if (InCallback == nullptr)
 		return STATUS_INVALID_PARAMETER_3;
@@ -95,7 +97,7 @@ NTSTATUS CkEnumerateVirtualMemory(CONST PEPROCESS InProcess, TContext InContext,
 		
 		MEMORY_BASIC_INFORMATION MemoryInformation;
 
-		if (!NT_SUCCESS(CkQueryVirtualMemory(InProcess, CurrentAddress, &MemoryInformation)))
+		if (NT_ERROR(CkQueryVirtualMemory(InProcess, CurrentAddress, &MemoryInformation)))
 			break;
 
 		// 
@@ -132,8 +134,8 @@ NTSTATUS CkEnumerateVirtualMemory(CONST PEPROCESS InProcess, ENUMERATE_VIRTUAL_M
 /// <param name="InNumberOfBytes">The number of bytes.</param>
 /// <param name="InContext">The context.</param>
 /// <param name="InCallback">The callback.</param>
-template <typename TContext = PVOID>
-NTSTATUS CkEnumerateVirtualMemoryInRange(CONST PEPROCESS InProcess, CONST PVOID InBaseAddress, SIZE_T InNumberOfBytes, TContext InContext, bool(*InCallback)(ULONG InIndex, MEMORY_BASIC_INFORMATION* InMemoryInformation, TContext InContext))
+template <typename TContext>
+NTSTATUS CkEnumerateVirtualMemoryInRange(CONST PEPROCESS InProcess, CONST PVOID InBaseAddress, SIZE_T InNumberOfBytes, TContext InContext, ENUMERATE_VIRTUAL_MEMORY_WITH_CONTEXT<TContext> InCallback)
 {
 	// 
 	// Verify the passed parameters.
@@ -147,9 +149,6 @@ NTSTATUS CkEnumerateVirtualMemoryInRange(CONST PEPROCESS InProcess, CONST PVOID 
 	
 	if (InNumberOfBytes == 0)
 		return STATUS_INVALID_PARAMETER_3;
-
-	if (InContext == nullptr)
-		return STATUS_INVALID_PARAMETER_4;
 
 	if (InCallback == nullptr)
 		return STATUS_INVALID_PARAMETER_5;
@@ -170,7 +169,7 @@ NTSTATUS CkEnumerateVirtualMemoryInRange(CONST PEPROCESS InProcess, CONST PVOID 
 		
 		MEMORY_BASIC_INFORMATION MemoryInformation;
 
-		if (!NT_SUCCESS(CkQueryVirtualMemory(InProcess, CurrentAddress, &MemoryInformation)))
+		if (NT_ERROR(CkQueryVirtualMemory(InProcess, CurrentAddress, &MemoryInformation)))
 			break;
 
 		// 

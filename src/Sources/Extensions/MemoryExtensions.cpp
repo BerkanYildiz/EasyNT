@@ -38,7 +38,7 @@ NTSTATUS CkAllocateVirtualMemory(CONST PEPROCESS InProcess, SIZE_T InNumberOfByt
 	auto* Handle = ZwCurrentProcess();
 
 	if (InProcess != PsGetCurrentProcess())
-		if (!NT_SUCCESS(Status = ObOpenObjectByPointer(InProcess, OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, NULL, GENERIC_ALL, *PsProcessType, KernelMode, &Handle)))
+		if (NT_ERROR(Status = ObOpenObjectByPointer(InProcess, OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, NULL, GENERIC_ALL, *PsProcessType, KernelMode, &Handle)))
 			return Status;
 
 	// 
@@ -66,7 +66,7 @@ NTSTATUS CkAllocateVirtualMemory(CONST PEPROCESS InProcess, SIZE_T InNumberOfByt
 		// Zero the page(s).
 		// 
 
-		CkZeroVirtualMemory(InProcess, BaseAddress, InNumberOfBytes);
+		CkZeroVirtualMemory(InProcess, BaseAddress, NumberOfBytes);
 
 		// 
 		// Return the allocation address.
@@ -112,14 +112,15 @@ NTSTATUS CkFreeVirtualMemory(CONST PEPROCESS InProcess, CONST PVOID InBaseAddres
 	auto* Handle = ZwCurrentProcess();
 
 	if (InProcess != PsGetCurrentProcess())
-		if (!NT_SUCCESS(Status = ObOpenObjectByPointer(InProcess, OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, NULL, GENERIC_ALL, *PsProcessType, KernelMode, &Handle)))
+		if (NT_ERROR(Status = ObOpenObjectByPointer(InProcess, OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, NULL, GENERIC_ALL, *PsProcessType, KernelMode, &Handle)))
 			return Status;
 
 	// 
 	// Zero the virtual memory.
 	// 
 
-	CkZeroVirtualMemory(InProcess, InBaseAddress, InNumberOfBytes);
+	if (InNumberOfBytes != 0)
+		CkZeroVirtualMemory(InProcess, InBaseAddress, InNumberOfBytes);
 	
 	// 
 	// Release the virtual memory.
@@ -127,7 +128,6 @@ NTSTATUS CkFreeVirtualMemory(CONST PEPROCESS InProcess, CONST PVOID InBaseAddres
 
 	auto* VirtualAddress = InBaseAddress;
 	auto  VirtualSize = InFreeType == MEM_RELEASE ? 0 : InNumberOfBytes;
-
 	Status = ZwFreeVirtualMemory(Handle, &VirtualAddress, &VirtualSize, InFreeType);
 
 	// 
@@ -252,13 +252,17 @@ NTSTATUS CkCopyVirtualMemory(CONST PVOID InSourceAddress, PVOID InDestinationAdd
 	return CkCopyVirtualMemory(PsGetCurrentProcess(), InSourceAddress, PsGetCurrentProcess(), InDestinationAddress, InNumberOfBytes, OutNumberOfBytesCopied);
 }
 
+// 
+// Information.
+// 
+
 /// <summary>
 /// Queries information about the memory region located at the given virtual address.
 /// </summary>
 /// <param name="InProcess">The process.</param>
 /// <param name="InVirtualAddress">The virtual address of the region to lookup.</param>
 /// <param name="OutMemoryInformation">The returned memory information.</param>
-NTSTATUS CkQueryVirtualMemory(CONST PEPROCESS InProcess, CONST PVOID InVirtualAddress, OUT MEMORY_BASIC_INFORMATION* OutMemoryInformation)
+NTSTATUS CkQueryVirtualMemory(CONST PEPROCESS InProcess, CONST PVOID InVirtualAddress, OPTIONAL OUT MEMORY_BASIC_INFORMATION* OutMemoryInformation)
 {
 	NTSTATUS Status = { };
 
@@ -282,7 +286,7 @@ NTSTATUS CkQueryVirtualMemory(CONST PEPROCESS InProcess, CONST PVOID InVirtualAd
 	auto* Handle = ZwCurrentProcess();
 
 	if (InProcess != PsGetCurrentProcess())
-		if (!NT_SUCCESS(Status = ObOpenObjectByPointer(InProcess, OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, NULL, GENERIC_ALL, *PsProcessType, KernelMode, &Handle)))
+		if (NT_ERROR(Status = ObOpenObjectByPointer(InProcess, OBJ_KERNEL_HANDLE | OBJ_CASE_INSENSITIVE, NULL, GENERIC_ALL, *PsProcessType, KernelMode, &Handle)))
 			return Status;
 
 	// 

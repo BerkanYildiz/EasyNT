@@ -4,7 +4,14 @@
 #define PAGE_ROUND_UP(x)	((((ULONG_PTR) (x)) + PAGE_SIZE-1) & (~(PAGE_SIZE-1)))
 
 #define EASYNT_DEFAULT_ALLOCATION_TAG 'CkNt'
-#define EASYNT_ALLOCATION_TAG EASYNT_DEFAULT_ALLOCATION_TAG
+
+#ifdef _RELEASE
+	#define EASYNT_ALLOCATION_TAG 0
+#endif
+
+#ifndef EASYNT_ALLOCATION_TAG
+	#define EASYNT_ALLOCATION_TAG EASYNT_DEFAULT_ALLOCATION_TAG
+#endif
 
 /// <summary>
 /// Allocates memory from a specific pool with a tag.

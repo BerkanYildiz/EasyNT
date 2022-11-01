@@ -167,7 +167,8 @@ NTSTATUS PsGetProcesses(UNICODE_STRING InProcessName, OUT SYSTEM_PROCESS_INFORMA
 	{
 		if (OutNumberOfProcessEntries != nullptr)
 			*OutNumberOfProcessEntries = NumberOfMatchingProcessEntries;
-		
+
+		CkFreePool(ProcessEntries);
 		return STATUS_INSUFFICIENT_RESOURCES;
 	}
 

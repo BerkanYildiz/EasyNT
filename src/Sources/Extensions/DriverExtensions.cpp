@@ -79,3 +79,59 @@ NTSTATUS CkGetDriverObject(CONST WCHAR* InDriverName, OPTIONAL OUT PDRIVER_OBJEC
 	RtlInitUnicodeString(&DriverName, InDriverName);
 	return CkGetDriverObject(DriverName, OutDriverObject);
 }
+
+// 
+// Enumerations.
+// 
+
+/// <summary>
+/// Enumerates every devices owned by the given driver.
+/// </summary>
+/// <param name="InDriverObject">The driver object.</param>
+/// <param name="InCallback">The callback.</param>
+NTSTATUS CkEnumerateDevicesOfDriver(CONST DRIVER_OBJECT* InDriverObject, bool(*InCallback)(ULONG, DEVICE_OBJECT*))
+{
+	// 
+	// Verify the passed parameters.
+	// 
+
+	if (InDriverObject == nullptr)
+		return STATUS_INVALID_PARAMETER_1;
+
+	if (InCallback == nullptr)
+		return STATUS_INVALID_PARAMETER_2;
+
+	// 
+	// Retrieve the first device object.
+	// 
+
+	DEVICE_OBJECT* CurrentDevice = InDriverObject->DeviceObject;
+
+	if (CurrentDevice == nullptr)
+		return STATUS_NO_MORE_ENTRIES;
+
+	// 
+	// Loop through the device objects owned by the driver.
+	// 
+	
+	for (ULONG Idx = 0; ; Idx++)
+	{
+		ObfReferenceObject(CurrentDevice);
+		const auto SkipOtherEntries = InCallback(Idx, CurrentDevice);
+		ObfDereferenceObject(CurrentDevice);
+		
+		if (SkipOtherEntries)
+			break;
+
+		// 
+		// Move onto the next entry.
+		// 
+
+		CurrentDevice = CurrentDevice->NextDevice;
+
+		if (CurrentDevice == nullptr)
+			break;
+	}
+
+	return STATUS_SUCCESS;
+}
