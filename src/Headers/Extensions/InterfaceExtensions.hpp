@@ -7,7 +7,7 @@
 /// <param name="InInterfaceGuid">The interface GUID.</param>
 /// <param name="InContext">The context.</param>
 /// <param name="InCallback">The callback.</param>
-template <typename TContext>
+template <typename TContext = PVOID>
 NTSTATUS CkEnumerateDevicesByInterface(GUID InInterfaceGuid, TContext InContext, bool(*InCallback)(DEVICE_OBJECT*, TContext))
 {
 	NTSTATUS Status;
@@ -96,7 +96,7 @@ NTSTATUS CkEnumerateDevicesByInterface(GUID InInterfaceGuid, bool(*InCallback)(D
 /// <param name="InInterfaceGuid">The interface GUID.</param>
 /// <param name="InContext">The context.</param>
 /// <param name="InCallback">The callback.</param>
-template <typename TContext>
+template <typename TContext = PVOID>
 NTSTATUS CkEnumerateDevicesByInterface(CONST WCHAR* InInterfaceGuid, TContext InContext, bool(*InCallback)(DEVICE_OBJECT*, TContext))
 {
 	NTSTATUS Status;

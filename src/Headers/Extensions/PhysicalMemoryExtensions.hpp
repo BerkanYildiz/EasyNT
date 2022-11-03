@@ -8,7 +8,7 @@
 /// <param name="InNumberOfBytes">The number of bytes to read.</param>
 /// <param name="InContext">The context.</param>
 /// <param name="InCallback">The callback.</param>
-template <typename TContext>
+template <typename TContext = PVOID>
 NTSTATUS CkScopePhysicalMemory(PHYSICAL_ADDRESS InPhysicalAddress, SIZE_T InNumberOfBytes, TContext InContext, void(*InCallback)(PVOID, SIZE_T, TContext))
 {
 	// 

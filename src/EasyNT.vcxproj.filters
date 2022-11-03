@@ -83,6 +83,12 @@
     <ClInclude Include="Headers\Extensions\PhysicalMemoryExtensions.hpp">
       <Filter>Header Files\Extensions</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\Extensions\ChecksumExtensions.hpp">
+      <Filter>Header Files\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Extensions\PageTableExtensions.hpp">
+      <Filter>Header Files\Extensions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\EasyNT.cpp">
@@ -140,6 +146,12 @@
       <Filter>Source Files\Extensions</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Extensions\PhysicalMemoryExtensions.cpp">
+      <Filter>Source Files\Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Extensions\ChecksumExtensions.cpp">
+      <Filter>Source Files\Extensions</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Extensions\PageTableExtensions.cpp">
       <Filter>Source Files\Extensions</Filter>
     </ClCompile>
   </ItemGroup>

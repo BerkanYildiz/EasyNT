@@ -63,7 +63,7 @@ PIMAGE_SECTION_HEADER RtlModuleSectionHeaders(CONST PVOID InBaseAddress, OPTIONA
 /// <param name="InBaseAddress">The base address.</param>
 /// <param name="InContext">The context.</param>
 /// <param name="InCallback">The callback.</param>
-template <typename TContext>
+template <typename TContext = PVOID>
 NTSTATUS RtlEnumerateModuleSections(CONST PVOID InBaseAddress, TContext InContext, bool(*InCallback)(ULONG InIndex, IMAGE_SECTION_HEADER* InSectionHeader, TContext InContext))
 {
 	// 

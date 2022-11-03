@@ -38,6 +38,7 @@
     <ClInclude Include="Headers\EasyNT.h" />
     <ClInclude Include="Headers\EasyNTAPI.h" />
     <ClInclude Include="Headers\Extensions\ArrayExtensions.hpp" />
+    <ClInclude Include="Headers\Extensions\ChecksumExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\ConversionExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\DeviceExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\DriverExtensions.hpp" />
@@ -45,6 +46,7 @@
     <ClInclude Include="Headers\Extensions\InterfaceExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\MemoryExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\ModuleExtensions.hpp" />
+    <ClInclude Include="Headers\Extensions\PageTableExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\PhysicalMemoryExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\PointerExtensions.hpp" />
     <ClInclude Include="Headers\Extensions\ProcessExtensions.hpp" />
@@ -59,6 +61,7 @@
   <ItemGroup>
     <ClCompile Include="Sources\EasyNT.cpp" />
     <ClCompile Include="Sources\Extensions\ArrayExtensions.cpp" />
+    <ClCompile Include="Sources\Extensions\ChecksumExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\ConversionExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\DeviceExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\DriverExtensions.cpp" />
@@ -66,6 +69,7 @@
     <ClCompile Include="Sources\Extensions\InterfaceExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\MemoryExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\ModuleExtensions.cpp" />
+    <ClCompile Include="Sources\Extensions\PageTableExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\PhysicalMemoryExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\PointerExtensions.cpp" />
     <ClCompile Include="Sources\Extensions\ProcessExtensions.cpp" />

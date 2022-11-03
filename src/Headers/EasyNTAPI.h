@@ -429,3 +429,58 @@ typedef struct _IMAGE_BASE_RELOCATION {
 	ULONG  VirtualAddress;
 	ULONG  SizeOfBlock;
 } IMAGE_BASE_RELOCATION, * PIMAGE_BASE_RELOCATION;
+
+// 
+// Non-documented or exported structures for page tables.
+// 
+
+typedef struct _MMPTE_SOFTWARE
+{
+	ULONG Valid : 1;
+	ULONG PageFileLow : 4;
+	ULONG Protection : 5;
+	ULONG Prototype : 1;
+	ULONG Transition : 1;
+	ULONG Unused : 20;
+	ULONG PageFileHigh : 32;
+} MMPTE_SOFTWARE, *PMMPTE_SOFTWARE;
+
+typedef struct _HARDWARE_PTE                                                    // 16 / 16 elements; 0x0008 / 0x0008 Bytes
+{
+	UINT64                      Valid : 1; // ------ / 0x0000; Bit:   0
+	UINT64                      Write : 1; // ------ / 0x0000; Bit:   1
+	UINT64                      Owner : 1; // ------ / 0x0000; Bit:   2
+	UINT64                      WriteThrough : 1; // ------ / 0x0000; Bit:   3
+	UINT64                      CacheDisable : 1; // ------ / 0x0000; Bit:   4
+	UINT64                      Accessed : 1; // ------ / 0x0000; Bit:   5
+	UINT64                      Dirty : 1; // ------ / 0x0000; Bit:   6
+	UINT64                      LargePage : 1; // ------ / 0x0000; Bit:   7
+	UINT64                      Global : 1; // ------ / 0x0000; Bit:   8
+	UINT64                      CopyOnWrite : 1; // ------ / 0x0000; Bit:   9
+	UINT64                      Prototype : 1; // ------ / 0x0000; Bit:  10
+	UINT64                      reserved0 : 1; // ------ / 0x0000; Bit:  11
+	UINT64                      PageFrameNumber : 36; // ------ / 0x0000; Bits: 12 - 47
+	UINT64                      reserved1 : 4; // ------ / 0x0000; Bits: 48 - 51
+	UINT64                      SoftwareWsIndex : 11; // ------ / 0x0000; Bits: 52 - 62
+	UINT64                      NoExecute : 1; // ------ / 0x0000; Bit:  63
+} HARDWARE_PTE, *PHARDWARE_PTE;
+
+typedef struct _MMPTE
+{
+	union
+	{
+		UINT64                  Long;
+		volatile UINT64         VolatileLong;
+		HARDWARE_PTE			Hard;
+		MMPTE_SOFTWARE			Soft;
+	} u;
+} MMPTE, *PMMPTE;
+
+typedef MMPTE	MMPDE;
+typedef MMPDE*	PMMPDE;
+
+typedef MMPDE	MMPML4E;
+typedef MMPDE	MMPDPTE;
+
+typedef MMPML4E	MMPXE;
+typedef MMPDPTE	MMPPE;

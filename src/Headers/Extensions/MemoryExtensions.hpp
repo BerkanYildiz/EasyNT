@@ -1,7 +1,7 @@
 #pragma once
 
 typedef bool(* ENUMERATE_VIRTUAL_MEMORY)(ULONG InIndex, MEMORY_BASIC_INFORMATION* InMemoryInformation);
-template <typename TContext>
+template <typename TContext = PVOID>
 using ENUMERATE_VIRTUAL_MEMORY_WITH_CONTEXT = bool(*)(ULONG InIndex, MEMORY_BASIC_INFORMATION* InMemoryInformation, TContext InContext);
 
 /// <summary>
@@ -69,7 +69,7 @@ NTSTATUS CkQueryVirtualMemory(CONST PEPROCESS InProcess, CONST PVOID InVirtualAd
 /// <param name="InProcess">The process.</param>
 /// <param name="InContext">The context.</param>
 /// <param name="InCallback">The callback.</param>
-template <typename TContext>
+template <typename TContext = PVOID>
 NTSTATUS CkEnumerateVirtualMemory(CONST PEPROCESS InProcess, TContext InContext, ENUMERATE_VIRTUAL_MEMORY_WITH_CONTEXT<TContext> InCallback)
 {
 	// 
@@ -134,7 +134,7 @@ NTSTATUS CkEnumerateVirtualMemory(CONST PEPROCESS InProcess, ENUMERATE_VIRTUAL_M
 /// <param name="InNumberOfBytes">The number of bytes.</param>
 /// <param name="InContext">The context.</param>
 /// <param name="InCallback">The callback.</param>
-template <typename TContext>
+template <typename TContext = PVOID>
 NTSTATUS CkEnumerateVirtualMemoryInRange(CONST PEPROCESS InProcess, CONST PVOID InBaseAddress, SIZE_T InNumberOfBytes, TContext InContext, ENUMERATE_VIRTUAL_MEMORY_WITH_CONTEXT<TContext> InCallback)
 {
 	// 

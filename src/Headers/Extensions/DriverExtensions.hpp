@@ -46,7 +46,7 @@ NTSTATUS CkGetDriverObject(CONST WCHAR* InDriverName, OPTIONAL OUT PDRIVER_OBJEC
 /// <param name="InDriverObject">The driver object.</param>
 /// <param name="InContext">The context.</param>
 /// <param name="InCallback">The callback.</param>
-template <typename TContext>
+template <typename TContext = PVOID>
 NTSTATUS CkEnumerateDevicesOfDriver(CONST DRIVER_OBJECT* InDriverObject, TContext InContext, bool(*InCallback)(ULONG, DEVICE_OBJECT*, TContext))
 {
 	// 

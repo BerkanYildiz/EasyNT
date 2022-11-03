@@ -91,7 +91,7 @@ NTSTATUS CkGetFileObject(CONST WCHAR* InFileName, ACCESS_MASK InDesiredAccess, O
 /// <param name="InDeviceObject">The device whose stack will be enumerated.</param>
 /// <param name="InContext">The context.</param>
 /// <param name="InCallback">The function executed on each device in the stack.</param>
-template <typename TContext>
+template <typename TContext = PVOID>
 NTSTATUS CkEnumerateDeviceStack(DEVICE_OBJECT* InDeviceObject, TContext InContext, bool(*InCallback)(ULONG, DEVICE_OBJECT*, TContext))
 {
 	// 
