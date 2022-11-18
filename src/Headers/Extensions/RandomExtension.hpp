@@ -62,6 +62,17 @@ UINT32 RtlRandomInteger(UINT32 MaxValueExcluded);
 UINT32 RtlRandomInteger();
 
 /// <summary>
+/// Generates a random long value from 0 to a given number excluded.
+/// </summary>
+/// <param name="MaxValueExcluded">The maximum value (excluded) to be returned.</param>
+UINT64 RtlRandomLong(UINT64 MaxValueExcluded);
+
+/// <summary>
+/// Generates a random long value from 0 to 18,446,744,073,709,551,615 excluded.
+/// </summary>
+UINT64 RtlRandomLong();
+
+/// <summary>
 /// Generates a random boolean value, which can be either false or true.
 /// </summary>
 BOOLEAN RtlRandomBoolean();

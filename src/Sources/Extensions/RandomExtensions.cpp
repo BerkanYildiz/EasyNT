@@ -66,6 +66,45 @@ UINT32 RtlRandomInteger()
 }
 
 /// <summary>
+/// Generates a random long value from 0 to a given number excluded.
+/// </summary>
+/// <param name="MaxValueExcluded">The maximum value (excluded) to be returned.</param>
+UINT64 RtlRandomLong(UINT64 MaxValueExcluded)
+{
+	if (MaxValueExcluded <= MAXUINT32)
+	{
+	FallbackInteger:
+		LARGE_INTEGER PerfCounter = KeQueryPerformanceCounter(nullptr);
+		return RtlRandomEx(&PerfCounter.LowPart) % MaxValueExcluded;
+	}
+	else
+	{
+		CONST UINT64 ModuleRest = MaxValueExcluded - MAXUINT32;
+
+		if (ModuleRest == 0)
+			goto FallbackInteger;
+
+		LARGE_INTEGER PerfCounter = KeQueryPerformanceCounter(nullptr);
+		CONST UINT64 NumberOne = RtlRandomEx(&PerfCounter.LowPart);
+		CONST UINT64 NumberTwo = RtlRandomEx(&PerfCounter.LowPart + 1) % ModuleRest;
+		CONST UINT64 FinalNumber = NumberOne + NumberTwo;
+
+		if (FinalNumber >= MaxValueExcluded)
+			return MaxValueExcluded;
+		else
+			return FinalNumber;
+	}
+}
+
+/// <summary>
+/// Generates a random long value from 0 to 18,446,744,073,709,551,615 excluded.
+/// </summary>
+UINT64 RtlRandomLong()
+{
+	return RtlRandomLong(0xFFFFFFFF'FFFFFFFF);
+}
+
+/// <summary>
 /// Generates a random boolean value, which can be either false or true.
 /// </summary>
 BOOLEAN RtlRandomBoolean()
