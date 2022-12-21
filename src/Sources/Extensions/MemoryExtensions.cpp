@@ -184,8 +184,6 @@ NTSTATUS CkZeroVirtualMemory(CONST PEPROCESS InProcess, CONST PVOID InBaseAddres
 	return STATUS_SUCCESS;
 }
 
-#define _WIN11_WORKAROUND
-#ifdef _WIN11_WORKAROUND
 //
 // The maximum amount to try to Probe and Lock is 14 pages, this
 // way it always fits in a 16 page allocation.
@@ -512,7 +510,6 @@ CompleteService:
 
 	return Status;
 }
-#endif
 
 /// <summary>
 /// Safely copy virtual memory from the source address to the destination address.
@@ -558,11 +555,10 @@ NTSTATUS CkCopyVirtualMemory(CONST PEPROCESS InSourceProcess, CONST PVOID InSour
 	// 
 
 	SIZE_T NumberOfBytesCopied = 0;
-#ifndef _WIN11_WORKAROUND
-	Status = MmCopyVirtualMemory(InSourceProcess, InSourceAddress, InDestinationProcess, InDestinationAddress, InNumberOfBytes, KernelMode, &NumberOfBytesCopied);
-#else
-	Status = MmCopyVirtualMemoryImpl(InSourceProcess, InSourceAddress, InDestinationProcess, InDestinationAddress, InNumberOfBytes, KernelMode, &NumberOfBytesCopied);
-#endif
+	if (RtlGetVersionBuildNumber() >= 22000)
+		Status = MmCopyVirtualMemoryImpl(InSourceProcess, InSourceAddress, InDestinationProcess, InDestinationAddress, InNumberOfBytes, KernelMode, &NumberOfBytesCopied);
+	else
+		Status = MmCopyVirtualMemory(InSourceProcess, InSourceAddress, InDestinationProcess, InDestinationAddress, InNumberOfBytes, KernelMode, &NumberOfBytesCopied);
 
 	// 
 	// Return the result.
