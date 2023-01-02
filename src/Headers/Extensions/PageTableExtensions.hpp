@@ -212,7 +212,7 @@ NTSTATUS CkEnumeratePpeOfPxe(CONST MMPXE* InPxe, TContext InContext, void(*InCal
 	if (!InPxe->u.Hard.Valid)
 		return STATUS_INVALID_ADDRESS;
 
-	if (!InPxe->u.Hard.LargePage)
+	if (InPxe->u.Hard.LargePage)
 		return STATUS_INVALID_WEIGHT;
 
 	// 
@@ -280,7 +280,7 @@ NTSTATUS CkEnumeratePdeOfPpe(CONST MMPPE* InPpe, TContext InContext, void(*InCal
 	if (!InPpe->u.Hard.Valid)
 		return STATUS_INVALID_ADDRESS;
 
-	if (!InPpe->u.Hard.LargePage)
+	if (InPpe->u.Hard.LargePage)
 		return STATUS_INVALID_WEIGHT;
 
 	// 
@@ -348,7 +348,7 @@ NTSTATUS CkEnumeratePteOfPde(CONST MMPDE* InPde, TContext InContext, void(*InCal
 	if (!InPde->u.Hard.Valid)
 		return STATUS_INVALID_ADDRESS;
 
-	if (!InPde->u.Hard.LargePage)
+	if (InPde->u.Hard.LargePage)
 		return STATUS_INVALID_WEIGHT;
 
 	// 
