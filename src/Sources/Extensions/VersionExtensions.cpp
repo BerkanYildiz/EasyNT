@@ -45,7 +45,7 @@ BOOLEAN RtlCurrentPlatformIs(BYTE InPlatform)
 		case OS_PLATFORM_WINDOWS_11:
 		{
 			return CurrentBuildNumber >= 22000 &&
-				   CurrentBuildNumber <= 22631;
+				   CurrentBuildNumber < 30000;
 		}
 
 		case OS_PLATFORM_WINDOWS_10:
