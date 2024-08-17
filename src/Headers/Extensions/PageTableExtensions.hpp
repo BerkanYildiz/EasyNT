@@ -1,8 +1,7 @@
 #pragma once
 
 // 
-//  - PZE : PML5E (Software Defined)
-// 
+//  - PZE : PML5E (SLAT)
 //  - PXE : PML4E
 //  - PPE : PDPTE
 //  - PDE : PDE
@@ -43,11 +42,11 @@
 #define MiGetVirtualAddressOfPml4e(Pml4e) (MiGetVirtualAddressOfPxe(Pml4e))
 #define MiGetVirtualAddressOfPdpte(Ppdte) (MiGetVirtualAddressOfPpe(Ppdte))
 
-#define MiGetVirtualAddressOfPze(Pze) ((PVOID) (((UINT64) (Pze) << (PZI_SHIFT + VA_SHIFT - PTE_SHIFT)) >> VA_SHIFT))
-#define MiGetVirtualAddressOfPxe(Pxe) ((PVOID) (((UINT64) (Pxe) << (PXI_SHIFT + VA_SHIFT - PTE_SHIFT)) >> VA_SHIFT))
-#define MiGetVirtualAddressOfPpe(Ppe) ((PVOID) (((UINT64) (Ppe) << (PPI_SHIFT + VA_SHIFT - PTE_SHIFT)) >> VA_SHIFT))
-#define MiGetVirtualAddressOfPde(Pde) ((PVOID) (((UINT64) (Pde) << (PDI_SHIFT + VA_SHIFT - PTE_SHIFT)) >> VA_SHIFT))
-#define MiGetVirtualAddressOfPte(Pte) ((PVOID) (((UINT64) (Pte) << (PTI_SHIFT + VA_SHIFT - PTE_SHIFT)) >> VA_SHIFT))
+#define MiGetVirtualAddressOfPze(Pze) ((PVOID) (((INT64) (Pze) << (PZI_SHIFT + VA_SHIFT - PTE_SHIFT)) >> VA_SHIFT))
+#define MiGetVirtualAddressOfPxe(Pxe) ((PVOID) (((INT64) (Pxe) << (PXI_SHIFT + VA_SHIFT - PTE_SHIFT)) >> VA_SHIFT))
+#define MiGetVirtualAddressOfPpe(Ppe) ((PVOID) (((INT64) (Ppe) << (PPI_SHIFT + VA_SHIFT - PTE_SHIFT)) >> VA_SHIFT))
+#define MiGetVirtualAddressOfPde(Pde) ((PVOID) (((INT64) (Pde) << (PDI_SHIFT + VA_SHIFT - PTE_SHIFT)) >> VA_SHIFT))
+#define MiGetVirtualAddressOfPte(Pte) ((PVOID) (((INT64) (Pte) << (PTI_SHIFT + VA_SHIFT - PTE_SHIFT)) >> VA_SHIFT))
 
 #pragma pack(push, 1)
 
