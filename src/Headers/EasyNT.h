@@ -9,12 +9,13 @@
 #include <wdm.h>
 #include <ntstrsafe.h>
 #include <intrin.h>
+#include <minwindef.h>
 
 // 
 // Include the process hacker headers.
 // 
 
-#define PHNT_VERSION 107
+#define PHNT_VERSION 108
 #define PHNT_MODE 0
 
 #include "../../libraries/phnt/phnt.h"
